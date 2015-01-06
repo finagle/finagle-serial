@@ -5,17 +5,17 @@ import java.net.SocketAddress
 import com.twitter.finagle._
 import com.twitter.io.Buf
 import com.twitter.util.Future
-import io.github.finagle.serial.SerialCodec
+import io.github.finagle.serial.Codec
 
 /**
- * A Serial Mux server and client.
+ * A Serial server and client.
  *
  * @tparam Req the request type
  * @tparam Rep the response type
  */
 class Serial[Req, Rep](
-  serialReq: SerialCodec[Req],
-  serialRep: SerialCodec[Rep]
+  reqCodec: Codec[Req],
+  repCodec: Codec[Rep]
 ) extends Server[Req, Rep] with Client[Req, Rep] {
 
   private def arrayToBuf(array: Array[Byte]) = Buf.ByteArray.Owned(array)
@@ -23,9 +23,9 @@ class Serial[Req, Rep](
 
   private val muxToObject = new Filter[mux.Request, mux.Response, Req, Rep] {
     override def apply(muxReq: mux.Request, service: Service[Req, Rep]): Future[mux.Response] = for {
-      req <- Future.const(serialReq.deserialize(bufToArray(muxReq.body)))
+      req <- Future.const(reqCodec.deserialize(bufToArray(muxReq.body)))
       rep <- service(req)
-      body <- Future.const(serialRep.serialize(rep))
+      body <- Future.const(repCodec.serialize(rep))
     } yield mux.Response(arrayToBuf(body))
   }
 
@@ -36,9 +36,9 @@ class Serial[Req, Rep](
     Mux.client.newClient(dest, label) map { service =>
       new Service[Req, Rep] {
         override def apply(req: Req): Future[Rep] = for {
-          body <- Future.const(serialReq.serialize(req))
+          body <- Future.const(reqCodec.serialize(req))
           muxRep <- service(mux.Request(Path.empty, arrayToBuf(body)))
-          rep <- Future.const(serialRep.deserialize(bufToArray(muxRep.body)))
+          rep <- Future.const(repCodec.deserialize(bufToArray(muxRep.body)))
         } yield rep
       }
     }
@@ -50,10 +50,10 @@ class Serial[Req, Rep](
  * {{{
  *   case class User(name: String)
  *   case class Greeting(u: User)
- *   val client = Serial[User, Greeting].newClient("localhost")
+ *   val service = Serial[User, Greeting].newService("localhost:8080")
  * }}}
  */
 object Serial {
-  def apply[Req, Rep](implicit serialReq: SerialCodec[Req], serialRep: SerialCodec[Rep]) =
-    new Serial[Req, Rep](serialReq, serialRep)
+  def apply[Req, Rep](implicit reqCodec: Codec[Req], repCodec: Codec[Rep]) =
+    new Serial[Req, Rep](reqCodec, repCodec)
 }

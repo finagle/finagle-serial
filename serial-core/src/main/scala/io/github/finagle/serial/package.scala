@@ -27,12 +27,12 @@ package object serial {
   /**
    *  An abstraction that provides a serialization codec for type ''A''.
    */
-  trait SerialCodec[A] {
+  trait Codec[A] {
     val serialize: Serialize[A]
     val deserialize: Deserialize[A]
   }
 
-  implicit def toJavaIOCodec[A]: SerialCodec[A] = new SerialCodec[A] {
+  implicit def toJavaIOCodec[A]: Codec[A] = new Codec[A] {
     override val serialize = new Serialize[A] {
       override def apply(req: A): Try[Array[Byte]] = {
         val byteArray = new ByteArrayOutputStream()
