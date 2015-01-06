@@ -4,13 +4,13 @@ import com.typesafe.sbt.pgp.PgpKeys._
 
 object Serial extends Build {
 
-  resolvers += "Twitter's Repository" at "http://maven.twttr.com/"
-
   val baseSettings = Defaults.defaultSettings ++ Seq(
     libraryDependencies ++= Seq(
-      "com.twitter" %% "finagle-mux" % "6.24.0"
+      "com.twitter" %% "finagle-mux" % "6.24.0",
+      "org.scalatest" %% "scalatest" % "2.2.1" % "test"
     ),
-    scalacOptions ++= Seq( "-unchecked", "-deprecation", "-feature")
+    scalacOptions ++= Seq( "-unchecked", "-deprecation", "-feature"),
+    resolvers += "Twitter's Repository" at "http://maven.twttr.com/"
   )
 
   lazy val buildSettings = Seq(
