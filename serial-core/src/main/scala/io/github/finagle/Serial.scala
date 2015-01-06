@@ -3,12 +3,9 @@ package io.github.finagle
 import java.net.SocketAddress
 
 import com.twitter.finagle._
-import com.twitter.finagle.mux.{Response, Request}
 import com.twitter.io.Buf
-import com.twitter.util.{Return, Future}
-import io.github.finagle.serial.{Deserialize, Serialize}
-
-import scala.util.Success
+import com.twitter.util.Future
+import io.github.finagle.serial.{SerialCodec, Deserialize, Serialize}
 
 /**
  * A Serial Mux server and client.
@@ -17,18 +14,19 @@ import scala.util.Success
  * @tparam Rep the response type
  */
 class Serial[Req, Rep](
-  serializeReq: Serialize[Req],
-  serializeRep: Serialize[Rep],
-  deserializeReq: Deserialize[Req],
-  deserializeRep: Deserialize[Rep]
+  serialReq: SerialCodec[Req],
+  serialRep: SerialCodec[Rep]
 ) extends Server[Req, Rep] with Client[Req, Rep] {
 
+  private def arrayToBuf(array: Array[Byte]) = Buf.ByteArray.Owned(array)
+  private def bufToArray(buf: Buf) = Buf.ByteArray.Owned.extract(buf)
+
   private val muxToObject = new Filter[mux.Request, mux.Response, Req, Rep] {
-    override def apply(muxReq: mux.Request, service: Service[Req, Rep]): Future[mux.Response] = {
-      Future.const(deserializeReq(Buf.ByteArray.Owned.extract(muxReq.body))) flatMap service map { rep =>
-        mux.Response(Buf.ByteArray.Owned(serializeRep(rep)))
-      }
-    }
+    override def apply(muxReq: mux.Request, service: Service[Req, Rep]): Future[mux.Response] = for {
+      req <- Future.const(serialReq.deserialize(bufToArray(muxReq.body)))
+      rep <- service(req)
+      body <- Future.const(serialRep.serialize(rep))
+    } yield mux.Response(arrayToBuf(body))
   }
 
   override def serve(addr: SocketAddress, factory: ServiceFactory[Req, Rep]): ListeningServer =
@@ -37,12 +35,11 @@ class Serial[Req, Rep](
   override def newClient(dest: Name, label: String): ServiceFactory[Req, Rep] =
     Mux.client.newClient(dest, label) map { service =>
       new Service[Req, Rep] {
-        override def apply(req: Req): Future[Rep] = {
-          val muxReq = mux.Request(Path.empty, Buf.ByteArray.Owned(serializeReq(req)))
-          service(muxReq) flatMap { muxRep =>
-            Future.const(deserializeRep(Buf.ByteArray.Owned.extract(muxRep.body)))
-          }
-        }
+        override def apply(req: Req): Future[Rep] = for {
+          body <- Future.const(serialReq.serialize(req))
+          muxRep <- service(mux.Request(Path.empty, arrayToBuf(body)))
+          rep <- Future.const(serialRep.deserialize(bufToArray(muxRep.body)))
+        } yield rep
       }
     }
 }
@@ -57,7 +54,6 @@ class Serial[Req, Rep](
  * }}}
  */
 object Serial {
-  def apply[Req, Rep](implicit serializeReq: Serialize[Req], serializeRep: Serialize[Rep],
-                      deserializeReq: Deserialize[Req], deserializeRep: Deserialize[Rep]) =
-    new Serial[Req, Rep](serializeReq, serializeRep, deserializeReq, deserializeRep)
+  def apply[Req, Rep](implicit serialReq: SerialCodec[Req], serialRep: SerialCodec[Rep]) =
+    new Serial[Req, Rep](serialReq, serialRep)
 }
