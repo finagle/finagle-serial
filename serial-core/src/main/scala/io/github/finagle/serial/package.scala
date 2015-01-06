@@ -32,7 +32,7 @@ package object serial {
     val deserialize: Deserialize[A]
   }
 
-  def toJavaIOCodec[A] = new SerialCodec[A] {
+  implicit def toJavaIOCodec[A]: SerialCodec[A] = new SerialCodec[A] {
     override val serialize = new Serialize[A] {
       override def apply(req: A): Try[Array[Byte]] = {
         val byteArray = new ByteArrayOutputStream()
