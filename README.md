@@ -1,14 +1,24 @@
-[![Build Status](https://travis-ci.org/finagle/finagle-serial.svg)](https://travis-ci.org/finagle/finagle-serial)
+[![Build Status](https://travis-ci.org/finagle/finagle-serial.svg?branch=master)](https://travis-ci.org/finagle/finagle-serial)
 
-Finagle Serial is a Finagle Codec over Scala's case classes. It allows to easily build custom protocols over [Mux][1]
-without boilerplate code. Finagle Serial also supports pluggabble serialization libraries such as [Scodec][2] and
-[Pickling][3] but its full functionality is available with zero-dependencies on top of [Java Serialization API][4].
+Finagle Serial supports the creation of Finagle servers and clients that use
+Scala (or Java) libraries for serialization instead of IDL-based systems like
+[Apache Thrift][1] or Google's [Protobuf][2]. It's designed to make it easy
+to construct production-ready services that take arbitrary Scala types as inputs
+and outputs, with minimal boilerplate.
+
+Finagle Serial uses [Mux][3] as its session-layer protocol, with object
+serialization (the _presentation layer_, to use the terminology of the
+[OSI model][4]) supplied by a pluggable wrapper for the serialization library of
+your choice. We provide support for [Scodec][5] and [Scala Pickling][6], as well
+as an implementation that uses the [Java Serialization API][7] and offers the
+full functionality of Finagle Serial without adding a dependency on an external
+serialization library.
 
 * [Quick Start](#quick-start)
 * [Installation](#installation)
 
-Quick Start
------------
+Quickstart
+----------
 
 ```scala
 import io.github.finagle.serial._
@@ -40,7 +50,10 @@ Installation
 libraryDependencies += ???
 ```
 
-[1]: http://twitter.github.io/finagle/guide/Protocols.html#mux
-[2]: https://github.com/scodec/scodec
-[3]: https://github.com/scala/pickling
-[4]: http://docs.oracle.com/javase/7/docs/api/java/io/Serializable.html
+[1]: https://thrift.apache.org/
+[2]: https://github.com/google/protobuf/
+[3]: http://twitter.github.io/finagle/guide/Protocols.html#mux
+[4]: http://en.wikipedia.org/wiki/OSI_model
+[5]: https://github.com/scodec/scodec
+[6]: https://github.com/scala/pickling
+[7]: http://docs.oracle.com/javase/7/docs/api/java/io/Serializable.html
