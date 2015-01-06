@@ -58,11 +58,21 @@ object Serial extends Build {
     id = "finagle-serial",
     base = file("."),
     settings = allSettings
-  ) aggregate(core)
+  ) aggregate (core, pickling)
 
   lazy val core = Project(
     id = "serial-core",
     base = file("serial-core"),
     settings = allSettings
   )
+
+  lazy val pickling = Project(
+    id = "serial-pickling",
+    base = file("serial-pickling"),
+    settings = allSettings ++ Seq(
+      libraryDependencies ++= Seq (
+        "org.scala-lang" %% "scala-pickling" % "0.9.0"
+      )
+    )
+  ) dependsOn core
 }

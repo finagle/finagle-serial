@@ -1,8 +1,6 @@
 package io.github.finagle
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
-
-import com.twitter.util.{Throw, Return, Try}
+import com.twitter.util.Try
 
 package object serial {
 
@@ -30,32 +28,5 @@ package object serial {
   trait Codec[A] {
     val serialize: Serialize[A]
     val deserialize: Deserialize[A]
-  }
-
-  implicit def toJavaIOCodec[A]: Codec[A] = new Codec[A] {
-    override val serialize = new Serialize[A] {
-      override def apply(req: A): Try[Array[Byte]] = {
-        val byteArray = new ByteArrayOutputStream()
-        val out = new ObjectOutputStream(byteArray)
-
-        try {
-          out.writeObject(req)
-          Return(byteArray.toByteArray)
-        } catch {
-          case e: Exception => Throw(e)
-        } finally { out.close() }
-      }
-    }
-
-    override val deserialize = new Deserialize[A] {
-      override def apply(rep: Array[Byte]): Try[A] = {
-        val byteArray = new ByteArrayInputStream(rep)
-        val in = new ObjectInputStream(byteArray)
-
-        try { Return(in.readObject().asInstanceOf[A]) }
-        catch { case e: Exception  => Throw(e) }
-        finally { in.close() }
-      }
-    }
   }
 }
