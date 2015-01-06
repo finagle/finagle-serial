@@ -61,13 +61,13 @@ object Serial extends Build {
   ) aggregate (core, pickling)
 
   lazy val core = Project(
-    id = "serial-core",
+    id = "finagle-serial-core",
     base = file("serial-core"),
     settings = allSettings
   )
 
   lazy val pickling = Project(
-    id = "serial-pickling",
+    id = "finagle-serial-pickling",
     base = file("serial-pickling"),
     settings = allSettings ++ Seq(
       libraryDependencies ++= Seq (
