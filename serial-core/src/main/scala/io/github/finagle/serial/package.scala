@@ -37,14 +37,13 @@ package object serial {
       override def apply(req: A): Try[Array[Byte]] = {
         val byteArray = new ByteArrayOutputStream()
         val out = new ObjectOutputStream(byteArray)
+
         try {
           out.writeObject(req)
           Return(byteArray.toByteArray)
         } catch {
           case e: Exception => Throw(e)
-        } finally {
-          out.close()
-        }
+        } finally { out.close() }
       }
     }
 

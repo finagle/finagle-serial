@@ -4,6 +4,8 @@ import com.typesafe.sbt.pgp.PgpKeys._
 
 object Serial extends Build {
 
+  resolvers += "Twitter's Repository" at "http://maven.twttr.com/"
+
   val baseSettings = Defaults.defaultSettings ++ Seq(
     libraryDependencies ++= Seq(
       "com.twitter" %% "finagle-mux" % "6.24.0"
