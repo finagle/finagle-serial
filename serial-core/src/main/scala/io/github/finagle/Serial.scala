@@ -33,12 +33,13 @@ class Serial[Req, Rep](
     Mux.server.serve(addr, muxToObject andThen factory)
 
   override def newClient(dest: Name, label: String): ServiceFactory[Req, Rep] =
-    Mux.client.newClient(dest, label) map { service => new Service[Req, Rep] {
-      override def apply(req: Req): Future[Rep] = for {
-        body <- Future.const(serialReq.serialize(req))
-        muxRep <- service(mux.Request(Path.empty, arrayToBuf(body)))
-        rep <- Future.const(serialRep.deserialize(bufToArray(muxRep.body)))
-      } yield rep
+    Mux.client.newClient(dest, label) map { service =>
+      new Service[Req, Rep] {
+        override def apply(req: Req): Future[Rep] = for {
+          body <- Future.const(serialReq.serialize(req))
+          muxRep <- service(mux.Request(Path.empty, arrayToBuf(body)))
+          rep <- Future.const(serialRep.deserialize(bufToArray(muxRep.body)))
+        } yield rep
       }
     }
 }
