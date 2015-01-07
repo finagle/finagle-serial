@@ -68,4 +68,17 @@ class SerialSpec extends FlatSpec with Matchers {
     an [IllegalArgumentException] should be thrownBy Await.result(service("oof"))
     Await.ready(server.close())
   }
+
+  ignore should "results in future exception if it has been thrown by service" in {
+    case object MyException extends Exception
+    val server = Serial[String, String].serve(
+      new InetSocketAddress(8123),
+      new Service[String, String] {
+        override def apply(request: String) = Future.exception(MyException)
+      }
+    )
+    val service = mockService
+    a [MyException.type] should be thrownBy Await.result(service("bar"))
+    Await.ready(server.close())
+  }
 }
