@@ -11,7 +11,7 @@ package object pickling {
       override def apply(o: A): Try[Array[Byte]] = Return(o.pickle.value)
     }
     override val deserialize = new Deserialize[A] {
-      override def apply(a: Array[Byte]): Try[A] = Throw(new UnsupportedOperationException)
+      override def apply(a: Array[Byte]): Try[A] = Return(a.unpickle[A])
     }
   }
 }
