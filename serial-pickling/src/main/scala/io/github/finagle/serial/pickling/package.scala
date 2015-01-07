@@ -6,7 +6,7 @@ import scala.pickling._
 import scala.pickling.binary._
 
 package object pickling {
-  implicit def toPickling[A: SPickler: Unpickler: FastTypeTag]: Codec[A] = new Codec[A] {
+  implicit def toPicklingCodec[A: SPickler: Unpickler: FastTypeTag]: Codec[A] = new Codec[A] {
     override val serialize = new Serialize[A] {
       override def apply(o: A): Try[Array[Byte]] =
         try { Return(o.pickle.value) }
