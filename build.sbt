@@ -15,7 +15,7 @@ lazy val root = project.in(file("."))
   .settings(moduleName := "finagle-serial")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
-  .aggregate(core, pickling)
+  .aggregate(core, pickling, scodec)
 
 lazy val core = project.in(file("serial-core"))
   .settings(moduleName := "finagle-serial-core")
@@ -27,6 +27,13 @@ lazy val pickling = project.in(file("serial-pickling"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(libraryDependencies += "org.scala-lang" %% "scala-pickling" % "0.9.1")
+  .dependsOn(core)
+
+lazy val scodec = project.in(file("serial-scodec"))
+  .settings(moduleName := "finagle-serial-scodec")
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(libraryDependencies += "org.typelevel" %% "scodec-core" % "1.6.0")
   .dependsOn(core)
 
 lazy val publishSettings = Seq(

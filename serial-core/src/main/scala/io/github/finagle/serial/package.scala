@@ -28,5 +28,18 @@ package object serial {
   trait Codec[A] {
     val serialize: Serialize[A]
     val deserialize: Deserialize[A]
+
+    /**
+     * Round trips the given object of type ''A'' through this codec.
+     */
+    def roundTrip(in: A): Try[A] = for {
+      bytes <- serialize(in)
+      out <- deserialize(bytes)
+    } yield out
   }
+
+  // Errors produced by codec
+  abstract sealed class CodecError(message: String) extends Exception(message)
+  case class SerializationFailed(reason: String) extends CodecError(reason)
+  case class DeserializationFailed(reason: String) extends CodecError(reason)
 }
