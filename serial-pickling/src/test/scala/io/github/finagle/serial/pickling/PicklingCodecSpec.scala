@@ -5,7 +5,6 @@ import java.net.InetSocketAddress
 import com.twitter.finagle.Service
 import com.twitter.util.{Future, Await, Return}
 import io.github.finagle.Serial
-import io.github.finagle.serial.Codec
 import org.scalatest.{Matchers, FlatSpec}
 
 class PicklingCodecSpec extends FlatSpec with Matchers {
