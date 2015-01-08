@@ -61,13 +61,17 @@ Scodec Support
 
 Error Handling
 --------------
-Finagle Serial may throw an exception if it fails serialize or deserilize either
-request or response. Thus, the exceptions `io.github.finagle.serial.SerializationFailed`
-and `io.github.finagle.serial.DeserializationFailed` may be throw by client. According
-to the [Mux][3] protocol, it throws two types of exceptions: `com.twitter.finagle.mux.ServerError`
-and `com.twitter.finagle.mux.ServerApplicationError`. `ServerError` indicates a failure in the
-transport layer (i.e., failed serialization or deserialization of the request or response), while
-`ServerApplicationError` indicates a failure in user defined code (i.e., service implementation).
+Both Finagle Serial and [Mux][3] may throw an exception if they fail to serialize or deserialize
+either request or response. Thus, the exception `io.github.finagle.serial.ClientError` may be
+throw in case of failure at client side. According to the [Mux][3] protocol, it throws two types
+of exceptions:
+
+ * `com.twitter.finagle.mux.ServerError`
+ * `com.twitter.finagle.mux.ServerApplicationError`.
+
+Both of the exceptions indicate server side errors. `ServerError` indicates a failure in the
+transport layer (i.e., failed serialization or deserialization of the request or response),
+while `ServerApplicationError` indicates a failure in user defined code (i.e., service implementation).
 
 ```scala
 case class Point(x: Double, y: Double)
@@ -75,33 +79,16 @@ val zero = Point(0.0, 0.0)
 val scalePointBy10 = Serial[Point, Point].newService("localhost:8888")
 
 val point: Future[Point] = scalePointBy10(Point(3.14, 42.0)) handle {
-  case SerializationFailed(reason) => // failed to serialize request from client
-    zero
+  // failed to either serialize request from client
+  // or deserialize response from server
+  case ClientError(reason) => zero
 
-  case DeserializationFailed(reason) => // failed to deserialize response from server
-    zero
+  // failed to either deserialize request from client
+  // or serialize response from server
+  case ServerError(reason) => zero
 
-  case ServerError(reason) => // failed to either deserialize request from client
-    zero                      // or serialize response from server
-
-  case ServerApplicationError(reason) => // failed to scale point
-    zero
-}
-```
-
-In order to simplify the error handling, the base class `ClientError` may be used instead of
-`SerializationFailed` and `DeserializationFailed`.
-
-```scala
-val point: Future[Point] = scalePointBy10(Point(3.14, 42.0)) handle {
-  case ClientError(reason) => // failed to either serialize request from client
-    zero                      // or deserialize response from server
-
-  case ServerError(reason) => // failed to either deserialize request from client
-    zero                      // or serialize response from server
-
-  case ServerApplicationError(reason) => // failed to scale point
-    zero
+  // failed to scale point
+  case ServerApplicationError(reason) => zero
 }
 ```
 
