@@ -10,13 +10,13 @@ package object pickling {
     override val serialize = new Serialize[A] {
       override def apply(o: A): Try[Array[Byte]] =
         try { Return(o.pickle.value) }
-        catch { case e: Exception => Throw(SerializationFailed(e.getMessage)) }
+        catch { case e: Exception => Throw(ClientError(e.getMessage)) }
     }
 
     override val deserialize = new Deserialize[A] {
       override def apply(a: Array[Byte]): Try[A] =
         try { Return(a.unpickle[A]) }
-        catch { case e: Exception => Throw(DeserializationFailed(e.getMessage)) }
+        catch { case e: Exception => Throw(ClientError(e.getMessage)) }
     }
   }
 }

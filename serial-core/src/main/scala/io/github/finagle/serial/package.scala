@@ -38,8 +38,6 @@ package object serial {
     } yield out
   }
 
-  // Errors produced by codec
-  abstract sealed class ClientError(message: String) extends Exception(message)
-  case class SerializationFailed(reason: String) extends ClientError(reason)
-  case class DeserializationFailed(reason: String) extends ClientError(reason)
+  // Errors produced by client-side codec
+  case class ClientError(message: String) extends Exception(message)
 }
