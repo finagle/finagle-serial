@@ -39,7 +39,7 @@ package object serial {
   }
 
   // Errors produced by codec
-  abstract sealed class CodecError(message: String) extends Exception(message)
-  case class SerializationFailed(reason: String) extends CodecError(reason)
-  case class DeserializationFailed(reason: String) extends CodecError(reason)
+  abstract sealed class ClientError(message: String) extends Exception(message)
+  case class SerializationFailed(reason: String) extends ClientError(reason)
+  case class DeserializationFailed(reason: String) extends ClientError(reason)
 }
