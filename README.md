@@ -9,21 +9,23 @@ and outputs, with minimal boilerplate.
 Finagle Serial uses [Mux][3] as its session-layer protocol, with object
 serialization (the _presentation layer_, to use the terminology of the
 [OSI model][4]) supplied by a pluggable wrapper for the serialization library of
-your choice. We provide support for [Scodec][5] and [Scala Pickling][6], as well
-as an implementation that uses the [Java Serialization API][7] and offers the
-full functionality of Finagle Serial without adding a dependency on an external
-serialization library.
+your choice. We provide support for [Scodec][5] and [Scala Pickling][6].
 
 * [Quick Start](#quick-start)
 * [Installation](#installation)
+* [Using Finagle Serial with Scala Pickling](#pickling-support)
+* [Using Finagle Serial with Scodec](#scodec-support)
+* [Error Handling](#error-handling)
 * [License](#license)
 
 Quickstart
 ----------
 
+The quick start example uses [Scala Pickling][6] as serialization backend.
+
 ```scala
-import io.github.finagle.serial._
 import io.github.finagle.Serial
+import io.github.finagle.serial.pickling._
 import com.twitter.finagle.Service
 import com.twitter.util.Future
 
@@ -49,6 +51,58 @@ Installation
 
 ```scala
 libraryDependencies += ???
+```
+
+Pickling Support
+----------------
+
+Scodec Support
+--------------
+
+Error Handling
+--------------
+Finagle Serial may throw an exception if it fails serialize or deserilize either
+request or response. Thus, the exceptions `io.github.finagle.serial.SerializationFailed`
+and `io.github.finagle.serial.DeserializationFailed` may be throw by client. According
+to the [Mux][3] protocol, it throws two types of exceptions: `com.twitter.finagle.mux.ServerError`
+and `com.twitter.finagle.mux.ServerApplicationError`. `ServerError` indicates a failure in the
+transport layer (i.e., failed serialization or deserialization of the request or response), while
+`ServerApplicationError` indicates a failure in user defined code (i.e., service implementation).
+
+```scala
+case class Point(x: Double, y: Double)
+val zero = Point(0.0, 0.0)
+val scalePointBy10 = Serial[Point, Point].newService("localhost:8888")
+
+val point: Future[Point] = scalePointBy10(Point(3.14, 42.0)) handle {
+  case SerializationFailed(reason) => // failed to serialize request from client
+    zero
+
+  case DeserializationFailed(reason) => // failed to deserialize response from server
+    zero
+
+  case ServerError(reason) => // failed to either deserialize request from client
+    zero                      // or serialize response from server
+
+  case ServerApplicationError(reason) => // failed to scale point
+    zero
+}
+```
+
+In order to simplify the error handling, the base class `ClientError` may be used instead of
+`SerializationFailed` and `DeserializationFailed`.
+
+```scala
+val point: Future[Point] = scalePointBy10(Point(3.14, 42.0)) handle {
+  case ClientError(reason) => // failed to either serialize request from client
+    zero                      // or deserialize response from server
+
+  case ServerError(reason) => // failed to either deserialize request from client
+    zero                      // or serialize response from server
+
+  case ServerApplicationError(reason) => // failed to scale point
+    zero
+}
 ```
 
 License

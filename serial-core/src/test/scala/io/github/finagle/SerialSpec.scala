@@ -3,6 +3,7 @@ package io.github.finagle
 import java.net.InetSocketAddress
 
 import com.twitter.finagle.Service
+import com.twitter.finagle.mux.{ServerError, ServerApplicationError}
 import com.twitter.util.{Future, Throw, Return, Await}
 import io.github.finagle.serial.{Serialize, Deserialize}
 import org.scalatest.{Matchers, FlatSpec}
@@ -48,17 +49,17 @@ class SerialSpec extends FlatSpec with Matchers {
     Await.ready(server.close())
   }
 
-  ignore should "results in future exception if the response serialization failed" in {
+  it should "results in future exception if the response serialization failed" in {
     val server = mockServer
     val service = mockService
-    an [IllegalArgumentException] should be thrownBy Await.result(service("feeb daed"))
+    an [ServerError] should be thrownBy Await.result(service("feeb daed"))
     Await.ready(server.close())
   }
 
-  ignore should "results in future exception if request deserialization failed" in {
+  it should "results in future exception if request deserialization failed" in {
     val server = mockServer
     val service = mockService
-    an [IllegalArgumentException] should be thrownBy Await.result(service("foo"))
+    an [ServerError] should be thrownBy Await.result(service("foo"))
     Await.ready(server.close())
   }
 
@@ -69,16 +70,15 @@ class SerialSpec extends FlatSpec with Matchers {
     Await.ready(server.close())
   }
 
-  ignore should "results in future exception if it has been thrown by service" in {
-    case object MyException extends Exception
+  it should "results in future exception if it has been thrown by service" in {
     val server = Serial[String, String].serve(
       new InetSocketAddress(8123),
       new Service[String, String] {
-        override def apply(request: String) = Future.exception(MyException)
+        override def apply(request: String) = Future.exception(new Exception)
       }
     )
     val service = mockService
-    a [MyException.type] should be thrownBy Await.result(service("bar"))
+    a [ServerApplicationError] should be thrownBy Await.result(service("bar"))
     Await.ready(server.close())
   }
 }
