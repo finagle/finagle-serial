@@ -15,7 +15,7 @@ lazy val root = project.in(file("."))
   .settings(moduleName := "finagle-serial")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
-  .aggregate(core, pickling, scodec)
+  .aggregate(core, pickling, scodec, benchmark)
 
 lazy val core = project.in(file("serial-core"))
   .settings(moduleName := "finagle-serial-core")
@@ -35,6 +35,13 @@ lazy val scodec = project.in(file("serial-scodec"))
   .settings(publishSettings: _*)
   .settings(libraryDependencies += "org.typelevel" %% "scodec-core" % "1.6.0")
   .dependsOn(core)
+
+lazy val benchmark = project.in(file("serial-benchmark"))
+  .settings(moduleName := "finagle-serial-bencrhmark")
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(jmhSettings: _*)
+  .dependsOn(core, pickling, scodec)
 
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
