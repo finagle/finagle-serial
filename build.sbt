@@ -34,7 +34,10 @@ lazy val scodec = project.in(file("serial-scodec"))
   .settings(moduleName := "finagle-serial-scodec")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
-  .settings(libraryDependencies += "org.typelevel" %% "scodec-core" % "1.6.0")
+  .settings(
+    resolvers += Resolver.sonatypeRepo("snapshots"),
+    libraryDependencies += "org.typelevel" %% "scodec-core" % "1.7.0-SNAPSHOT"
+  )
   .dependsOn(core)
 
 lazy val benchmark = project.in(file("serial-benchmark"))
