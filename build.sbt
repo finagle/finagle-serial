@@ -16,36 +16,36 @@ lazy val root = project.in(file("."))
   .settings(moduleName := "finagle-serial")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
-  .aggregate(core, pickling, scodec, benchmark)
+  .aggregate(core, scodec, benchmark)
 
-lazy val core = project.in(file("serial-core"))
+lazy val core = project.in(file("core"))
   .settings(moduleName := "finagle-serial-core")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
 
-lazy val pickling = project.in(file("serial-pickling"))
-  .settings(moduleName := "finagle-serial-pickling")
-  .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
-  .settings(libraryDependencies += "org.scala-lang" %% "scala-pickling" % "0.9.1")
-  .dependsOn(core)
+lazy val scodecSettings = Seq(
+  resolvers += Resolver.sonatypeRepo("snapshots"),
+  libraryDependencies += "org.typelevel" %% "scodec-core" % "1.7.0-SNAPSHOT"
+)
 
-lazy val scodec = project.in(file("serial-scodec"))
+lazy val scodec = project.in(file("scodec"))
   .settings(moduleName := "finagle-serial-scodec")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
+  .settings(scodecSettings: _*)
   .settings(
     resolvers += Resolver.sonatypeRepo("snapshots"),
     libraryDependencies += "org.typelevel" %% "scodec-core" % "1.7.0-SNAPSHOT"
   )
   .dependsOn(core)
 
-lazy val benchmark = project.in(file("serial-benchmark"))
-  .settings(moduleName := "finagle-serial-bencrhmark")
+lazy val benchmark = project.in(file("benchmark"))
+  .settings(moduleName := "finagle-serial-benchmark")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
+  .settings(scodecSettings: _*)
   .settings(jmhSettings: _*)
-  .dependsOn(core, pickling, scodec)
+  .dependsOn(core, scodec)
 
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
