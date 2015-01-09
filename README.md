@@ -61,34 +61,32 @@ Scodec Support
 
 Error Handling
 --------------
-Both Finagle Serial and [Mux][3] may throw an exception if they fail to serialize or deserialize
-either request or response. Thus, the exception `io.github.finagle.serial.ClientError` may be
-throw in case of failure at client side. According to the [Mux][3] protocol, it throws two types
-of exceptions:
+There are two types of exceptions you should be aware of while using Finagle
+Serial:
 
- * `com.twitter.finagle.mux.ServerError`
- * `com.twitter.finagle.mux.ServerApplicationError`.
+* `io.github.finagle.serial.CodecError`
+* `com.twitter.finagle.mux.ServerError`
 
-Both of the exceptions indicate server side errors. `ServerError` indicates a failure in the
-transport layer (i.e., failed serialization or deserialization of the request or response),
-while `ServerApplicationError` indicates a failure in user defined code (i.e., service implementation).
+A `CodecError` indicates that codec fails to serialize or deserialize either
+request or response. The exception may be thrown by either client or server.
+
+A `ServerError` indicates a failure that violates the [Mux][3] protocol.
 
 ```scala
+case class PointError(message: String) extends Exception
 case class Point(x: Double, y: Double)
 val zero = Point(0.0, 0.0)
 val scalePointBy10 = Serial[Point, Point].newService("localhost:8888")
 
 val point: Future[Point] = scalePointBy10(Point(3.14, 42.0)) handle {
-  // failed to either serialize request from client
-  // or deserialize response from server
-  case ClientError(reason) => zero
+  // failed to serialized/deserialize request/response
+  case CodecError(reason) => zero
 
-  // failed to either deserialize request from client
-  // or serialize response from server
+  // indicates Mux error in the server stack
   case ServerError(reason) => zero
 
   // failed to scale point
-  case ServerApplicationError(reason) => zero
+  case PointError(reason) => zero
 }
 ```
 
