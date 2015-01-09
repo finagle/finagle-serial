@@ -8,7 +8,8 @@ lazy val commonSettings = Seq(
     "org.scalatest" %% "scalatest" % "2.2.1" % "test"
   ),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
-  resolvers += "Twitter's Repository" at "http://maven.twttr.com/"
+  resolvers += "Twitter's Repository" at "http://maven.twttr.com/",
+  parallelExecution in Test := false
 )
 
 lazy val root = project.in(file("."))
