@@ -3,7 +3,6 @@ package io.github.finagle.serial.scodec
 import _root_.scodec.bits.BitVector
 import _root_.scodec.{Codec, Err}
 import _root_.scodec.codecs._
-import com.twitter.finagle.mux.ServerApplicationError
 import com.twitter.util.{Return, Throw, Try}
 import io.github.finagle.Serial
 import io.github.finagle.serial.{EncodingError, UnencodedError}
@@ -29,18 +28,18 @@ trait ScodecSerial extends Serial {
     val codec = reqMessageCodec(c)
 
     codec.encode(Right(a)).fold(
-      bits => Return(bits.toByteArray),
       e => codec.encode(Left(EncodingError(e.message))).fold(
-        bits => Return(bits.toByteArray),
-        e => Throw(EncodingError(e.message))
-      )
+        e => Throw(EncodingError(e.message)),
+        bits => Return(bits.toByteArray)
+      ),
+      bits => Return(bits.toByteArray)
     )
   }
 
   def decodeReq[A](bytes: Array[Byte])(c: C[A]): Try[A] =
     reqMessageCodec(c).decode(BitVector(bytes)).fold(
-      o => o.value.fold(Throw(_), Return(_)),
-      e => Throw(EncodingError(e.message))
+      e => Throw(EncodingError(e.message)),
+      o => o.value.fold(Throw(_), Return(_))
     )
 
   private[this] def repMessageCodec[A](c: C[A]): Codec[
@@ -60,25 +59,25 @@ trait ScodecSerial extends Serial {
     val codec = repMessageCodec(c)
 
     codec.encode(message).fold(
-      bits => Return(bits.toByteArray),
       {
         case Err.MatchingDiscriminatorNotFound(t: Throwable, _) =>
           codec.encode(Left(Left(Right(UnencodedError(t.toString))))).fold(
-            bits => Return(bits.toByteArray),
-            e => Throw(EncodingError(e.message))
+            e => Throw(EncodingError(e.message)),
+            bits => Return(bits.toByteArray)
           )
         case e => codec.encode(Left(Left(Left(EncodingError(e.message))))).fold(
-          bits => Return(bits.toByteArray),
-          e => Throw(EncodingError(e.message))
+          e => Throw(EncodingError(e.message)),
+          bits => Return(bits.toByteArray)
         )
-      }
+      },
+      bits => Return(bits.toByteArray)
     )
   }
 
   def decodeRep[A](bytes: Array[Byte])(c: C[A]): Try[A] =
     repMessageCodec(c).decode(BitVector(bytes)).fold(
-      o => o.value.fold(_.fold(_.fold(Throw(_), Throw(_)), Throw(_)), Return(_)),
-      e => Throw(EncodingError(e.message))
+      e => Throw(EncodingError(e.message)),
+      o => o.value.fold(_.fold(_.fold(Throw(_), Throw(_)), Throw(_)), Return(_))
     )
 }
 
