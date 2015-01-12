@@ -5,4 +5,4 @@ resolvers ++= Seq(
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8.3")
 
-addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.1.7")
+addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.1.8")

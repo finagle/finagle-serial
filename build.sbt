@@ -1,15 +1,19 @@
 lazy val commonSettings = Seq(
   organization := "io.github.finagle",
   version := "0.0.1",
-  scalaVersion := "2.11.4",
-  crossScalaVersions := Seq("2.10.4", "2.11.4"),
+  scalaVersion := "2.11.5",
+  crossScalaVersions := Seq("2.10.4", "2.11.5"),
   libraryDependencies ++= Seq(
-    "com.twitter" %% "finagle-mux" % "6.24.0",
-    "org.scalatest" %% "scalatest" % "2.2.1" % "test"
-  ),
+    "com.twitter" %% "finagle-mux" % "6.24.0"
+  ) ++ testDependencies.map(_ % "test"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   resolvers += "Twitter's Repository" at "http://maven.twttr.com/",
   parallelExecution in Test := false
+)
+
+lazy val testDependencies = Seq(
+  "org.scalatest" %% "scalatest" % "2.2.3",
+  "org.scalacheck" %% "scalacheck" % "1.12.1"
 )
 
 lazy val root = project.in(file("."))
@@ -18,7 +22,7 @@ lazy val root = project.in(file("."))
   .settings(publishSettings: _*)
   .aggregate(core, scodec, benchmark)
 
-lazy val core = project.in(file("core"))
+lazy val core = project
   .settings(moduleName := "finagle-serial-core")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
@@ -28,18 +32,14 @@ lazy val scodecSettings = Seq(
   libraryDependencies += "org.typelevel" %% "scodec-core" % "1.7.0-SNAPSHOT"
 )
 
-lazy val scodec = project.in(file("scodec"))
+lazy val scodec = project
   .settings(moduleName := "finagle-serial-scodec")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(scodecSettings: _*)
-  .settings(
-    resolvers += Resolver.sonatypeRepo("snapshots"),
-    libraryDependencies += "org.typelevel" %% "scodec-core" % "1.7.0-SNAPSHOT"
-  )
   .dependsOn(core)
 
-lazy val benchmark = project.in(file("benchmark"))
+lazy val benchmark = project
   .settings(moduleName := "finagle-serial-benchmark")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
