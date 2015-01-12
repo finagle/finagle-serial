@@ -20,12 +20,19 @@ lazy val root = project.in(file("."))
   .settings(moduleName := "finagle-serial")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
-  .aggregate(core, scodec, benchmark)
+  .aggregate(core, test, scodec, benchmark)
 
 lazy val core = project
   .settings(moduleName := "finagle-serial-core")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
+
+lazy val test = project
+  .settings(moduleName := "finagle-serial-test")
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(libraryDependencies ++= testDependencies)
+  .dependsOn(core)
 
 lazy val scodecSettings = Seq(
   resolvers += Resolver.sonatypeRepo("snapshots"),
@@ -34,10 +41,12 @@ lazy val scodecSettings = Seq(
 
 lazy val scodec = project
   .settings(moduleName := "finagle-serial-scodec")
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings: _*)
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(scodecSettings: _*)
-  .dependsOn(core)
+  .dependsOn(core, test % "it")
 
 lazy val benchmark = project
   .settings(moduleName := "finagle-serial-benchmark")

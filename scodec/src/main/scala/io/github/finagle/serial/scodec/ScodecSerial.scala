@@ -8,7 +8,6 @@ import io.github.finagle.Serial
 import io.github.finagle.serial.{EncodingError, UnencodedError}
 
 trait ScodecSerial extends Serial {
-
   type C[A] = Codec[A]
 
   private[this] val stringWithLength: Codec[String] = variableSizeBits(uint24, utf8)

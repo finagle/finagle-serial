@@ -8,7 +8,6 @@ import java.net.InetSocketAddress
 import org.scalatest.{Matchers, FlatSpec}
 
 class ScodecCodecSpec extends FlatSpec with Matchers {
-
   case class Point(x: Double, y: Double)
 
   "An Scodec Codec" should "work being used standalone" in {
