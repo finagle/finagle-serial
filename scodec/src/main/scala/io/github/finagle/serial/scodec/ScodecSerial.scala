@@ -23,9 +23,9 @@ trait ScodecSerial extends Serial {
     stringWithLength.hlist.as[ApplicationError]
 
   /**
-   * By default we do not encode any application errors.
+   * By default we only encode a few exceptions from the standard library.
    */
-  lazy val applicationErrorCodec: Codec[Throwable] = ApplicationErrorCodec.empty.underlying
+  lazy val applicationErrorCodec: Codec[Throwable] = ApplicationErrorCodec.basic.underlying
 
   private[this] def reqMessageCodec[A](c: C[A]): Codec[Either[CodecError, A]] =
     either(bool, codecErrorCodec, c)

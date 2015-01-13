@@ -3,7 +3,7 @@ package io.github.finagle.serial.scodec
 import _root_.scodec._
 import _root_.scodec.codecs._
 import com.twitter.util.Await
-import io.github.finagle.serial.CodecError
+import io.github.finagle.serial.{ApplicationError, CodecError}
 import io.github.finagle.serial.test.SerialIntegrationTest
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.FunSuite
@@ -51,6 +51,26 @@ class ScodecIntegrationTest extends FunSuite with ScodecSerial with SerialIntegr
     }
 
     an[CodecError] should be thrownBy Await.result(client(Foo(1, "foo")))
+
+    server.close()
+  }
+
+  test("A service should correctly throw handled application errors") {
+    val (server, client) = createServerAndClient[String, Int](_.toInt)
+
+    an[NumberFormatException] should be thrownBy Await.result(client("not an integer"))
+
+    server.close()
+  }
+
+  case class UnknownError(message: String) extends Throwable
+
+  test("A service should correctly wrap unhandled application errors") {
+    val (server, client) = createServerAndClient[String, Int] { s =>
+      throw UnknownError("something happened")
+    }
+
+    an[ApplicationError] should be thrownBy Await.result(client("not an integer"))
 
     server.close()
   }
