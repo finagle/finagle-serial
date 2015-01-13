@@ -1,15 +1,15 @@
 [![Build Status](https://travis-ci.org/finagle/finagle-serial.svg?branch=master)](https://travis-ci.org/finagle/finagle-serial)
 
-Finagle Serial supports the creation of Finagle servers and clients that use
-Scala (or Java) libraries for serialization instead of IDL-based systems like
-[Apache Thrift][1] or Google's [Protobuf][2]. It's designed to make it easy
+Finagle Serial supports the creation of [Finagle][1] servers and clients that
+use Scala (or Java) libraries for serialization instead of IDL-based systems
+like [Apache Thrift][2] or Google's [Protobuf][3]. It's designed to make it easy
 to construct production-ready services that take arbitrary Scala types as inputs
 and outputs, with minimal boilerplate.
 
-Finagle Serial uses [Mux][3] as its session-layer protocol, with object
+Finagle Serial uses [Mux][4] as its session-layer protocol, with object
 serialization (the _presentation layer_, to use the terminology of the
-[OSI model][4]) supplied by a pluggable wrapper for the serialization library of
-your choice. We currently provide support for [Scodec][5].
+[OSI model][5]) supplied by a pluggable wrapper for the serialization library of
+your choice. We currently provide support for [Scodec][6].
 
 * [Quickstart](#quick-start)
 * [Installation](#installation)
@@ -42,9 +42,9 @@ object GreetUser extends Service[User, Greeting] {
 ```
 
 Now suppose we want to make this greeting service available on the network. All
-we need to do is pick a serialization backend (we'll use [Scodec][5] here),
+we need to do is pick a serialization backend (we'll use [Scodec][6] here),
 and provide codecs for our input and output types (see the Scodec
-[documentation][6] for an explanation of the use of `variableSizeBits`,
+[documentation][7] for an explanation of the use of `variableSizeBits`,
 `uint24`, and `utf8` here):
 
 ``` scala
@@ -146,7 +146,7 @@ Serial service:
 Testing
 -------
 
-We provide a `SerialIntegrationTest` that makes it easy to use [ScalaCheck][7]
+We provide a `SerialIntegrationTest` that makes it easy to use [ScalaCheck][8]
 to help verify that your serialization backend implementation is working
 correctly. For example, the following is a simplified (but complete) version of
 part of the integration testing for the Scodec backend:
@@ -195,7 +195,7 @@ Check the `test` project documentation for more information about these tools.
 Benchmarks
 ----------
 
-We also provide a very preliminary `benchmark` project that uses [JMH][8] to
+We also provide a very preliminary `benchmark` project that uses [JMH][9] to
 compare the performance of the Scodec backend to a similar Finagle Thrift
 service. In our initial testing, the Scodec backend manages about 40% of the
 throughput of the Thrift implementation:
@@ -220,12 +220,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-
-[1]: https://thrift.apache.org/
-[2]: https://github.com/google/protobuf/
-[3]: https://twitter.github.io/finagle/guide/Protocols.html#mux
-[4]: https://en.wikipedia.org/wiki/OSI_model
-[5]: https://github.com/scodec/scodec
-[6]: http://scodec.org/scodec/latest/api/index.html#scodec.codecs.package
-[7]: https://www.scalacheck.org/
-[8]: http://openjdk.java.net/projects/code-tools/jmh/
+[1]: https://github.com/twitter/finagle
+[2]: https://thrift.apache.org/
+[3]: https://github.com/google/protobuf/
+[4]: https://twitter.github.io/finagle/guide/Protocols.html#mux
+[5]: https://en.wikipedia.org/wiki/OSI_model
+[6]: https://github.com/scodec/scodec
+[7]: http://scodec.org/scodec/latest/api/index.html#scodec.codecs.package
+[8]: https://www.scalacheck.org/
+[9]: http://openjdk.java.net/projects/code-tools/jmh/
