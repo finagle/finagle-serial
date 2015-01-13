@@ -20,7 +20,14 @@ lazy val root = project.in(file("."))
   .settings(moduleName := "finagle-serial")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
+  .settings(unidocSettings: _*)
+  .settings {
+    import UnidocKeys._
+
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmark)
+  }
   .aggregate(core, test, scodec, benchmark)
+
 
 lazy val core = project
   .settings(moduleName := "finagle-serial-core")

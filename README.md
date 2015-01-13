@@ -9,11 +9,10 @@ and outputs, with minimal boilerplate.
 Finagle Serial uses [Mux][3] as its session-layer protocol, with object
 serialization (the _presentation layer_, to use the terminology of the
 [OSI model][4]) supplied by a pluggable wrapper for the serialization library of
-your choice. We provide support for [Scodec][5] and [Scala Pickling][6].
+your choice. We currently provide support for [Scodec][5].
 
 * [Quick Start](#quick-start)
 * [Installation](#installation)
-* [Using Finagle Serial with Scala Pickling](#pickling-support)
 * [Using Finagle Serial with Scodec](#scodec-support)
 * [Error Handling](#error-handling)
 * [License](#license)
@@ -52,9 +51,6 @@ Installation
 ```scala
 libraryDependencies += ???
 ```
-
-Pickling Support
-----------------
 
 Scodec Support
 --------------

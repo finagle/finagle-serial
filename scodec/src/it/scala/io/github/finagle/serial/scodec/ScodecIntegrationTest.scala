@@ -2,6 +2,8 @@ package io.github.finagle.serial.scodec
 
 import _root_.scodec._
 import _root_.scodec.codecs._
+import com.twitter.util.Await
+import io.github.finagle.serial.CodecError
 import io.github.finagle.serial.test.SerialIntegrationTest
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.FunSuite
@@ -33,5 +35,19 @@ class ScodecIntegrationTest extends FunSuite with ScodecSerial with SerialIntegr
     testFunctionService[Foo, Foo] {
       case Foo(i, s) => Foo(i % 128, s * 2)
     }
+  }
+
+  test("A service should correctly throw encoding errors on the client side") {
+    val (server, client) = createServerAndClient[Foo, Int](_.i)
+
+    an[CodecError] should be thrownBy Await.result(client(Foo(Int.MaxValue, "foo")))
+  }
+
+  test("A service should correctly throw encoding errors on the server side") {
+    val (server, client) = createServerAndClient[Foo, Foo] {
+      case Foo(i, s) => Foo(Int.MaxValue, s)
+    }
+
+    an[CodecError] should be thrownBy Await.result(client(Foo(1, "foo")))
   }
 }

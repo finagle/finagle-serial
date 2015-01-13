@@ -11,20 +11,71 @@ import java.net.SocketAddress
 import scala.language.higherKinds
 
 /**
- * A Serial trait that supports the creation of server and clients.
+ * A trait that supports the creation of server and clients.
  */
 trait Serial {
 
+  /**
+   * Represents a codec for a given type.
+   */
   type C[_]
 
-  def encodingErrorCodec: C[EncodingError]
-  def unencodedErrorCodec: C[UnencodedError]
-  def domainErrorCodec: C[Throwable]
+  /**
+   * A codec for encoding errors.
+   *
+   * Because encoding errors are sent over the wire, an implementation needs to
+   * specify how to encode them.
+   */
+  def codecErrorCodec: C[CodecError]
 
+  /**
+   * A codec for "fall-back" errors.
+   *
+   * This will be used if [[io.github.finagle.Serial#applicationErrorCodec]]
+   * does not successfully encode an application error.
+   */
+  def unhandledApplicationErrorCodec: C[ApplicationError]
+
+  /**
+   * A codec for application errors.
+   *
+   * Implementations may decide which errors they wish to serialize.
+   */
+  def applicationErrorCodec: C[Throwable]
+
+  /**
+   * Encode a request.
+   *
+   * A "well-behaved" implementation should only fail with instances of
+   * [[io.github.finagle.serial.CodecError]]; all other errors will result in
+   * an [[com.twitter.finagle.mux.ServerApplicationError]] being returned.
+   */
   def encodeReq[A](a: A)(c: C[A]): Try[Array[Byte]]
+
+  /**
+   * Decode a request.
+   *
+   * An implementation should decode [[io.github.finagle.serial.CodecError]] and
+   * return instances as an error.
+   */
   def decodeReq[A](bytes: Array[Byte])(c: C[A]): Try[A]
 
+  /**
+   * Encode a result.
+   *
+   * An implementation should fail with [[io.github.finagle.serial.CodecError]]
+   * in the event of a encoding error. It should attempt to encode application
+   * errors with [[io.github.finagle.Serial#applicationErrorCodec]], and if that
+   * fails should return an [[io.github.finagle.serial.ApplicationError]].
+   */
   def encodeRep[A](t: Try[A])(c: C[A]): Try[Array[Byte]]
+
+  /**
+   * Decode a result.
+   *
+   * An implementation should deserialize the errors returned its
+   * [[io.github.finagle.Serial#encodeRep]].
+   */
   def decodeRep[A](bytes: Array[Byte])(c: C[A]): Try[A]
 
   private def arrayToBuf(array: Array[Byte]) = Buf.ByteArray.Owned(array)
@@ -33,15 +84,22 @@ trait Serial {
   private val BaseClientStack = Mux.client.stack
   private val BaseServerStack = Mux.server.stack
 
-  def client[Req, Rep](implicit reqCodec: C[Req], repCodec: C[Rep]) =
+  /**
+   * Create a [[com.twitter.finagle.Client]] given request and response codecs.
+   */
+  def client[Req, Rep](implicit reqCodec: C[Req], repCodec: C[Rep]): finagle.Client[Req, Rep] =
     Client[Req, Rep](reqCodec, repCodec)
 
-  def server[Req, Rep](implicit reqCodec: C[Req], repCodec: C[Rep]) =
+  /**
+   * Create a [[com.twitter.finagle.Server]] given request and response codecs.
+   */
+  def server[Req, Rep](implicit reqCodec: C[Req], repCodec: C[Rep]): finagle.Server[Req, Rep] =
     Server[Req, Rep](reqCodec, repCodec)
 
   /**
-   * Returns an instance of [[finagle.Client]] with [[finagle.Server]]
-   * of concrete serial protocol from ''Req'' to ''Rep''.
+   * Returns an instance of [[com.twitter.finagle.Client]] with
+   * [[com.twitter.finagle.Server]] of concrete serial protocol from ''Req'' to
+   * ''Rep''.
    *
    * {{{
    *   val server = Serial[Foo, Bar].serve(...)
@@ -64,6 +122,22 @@ trait Serial {
       override def serve(addr: SocketAddress, service: ServiceFactory[Req, Rep]) =
         s.serve(addr, service)
     }
+
+  /**
+   * A convenience method that creates a server from a function.
+   */
+  def serveFunction[Req, Rep](addr: SocketAddress)(
+    f: Req => Rep
+  )(implicit
+    reqCodec: C[Req],
+    repCodec: C[Rep]
+  ): ListeningServer = {
+    val service = new Service[Req, Rep] {
+      def apply(req: Req): Future[Rep] = Future.value(f(req))
+    }
+
+    apply[Req, Rep](reqCodec, repCodec).serve(addr, service)
+  }
 
   case class Client[Req, Rep](
     reqCodec: C[Req],
@@ -102,8 +176,9 @@ trait Serial {
     private[this] val toMux = new Filter[mux.Request, mux.Response, Req, Rep] {
       def apply(muxReq: mux.Request, service: Service[Req, Rep]): Future[mux.Response] =
         for {
-          req <- Future.const(decodeReq(bufToArray(muxReq.body))(reqCodec))
-          rep <- service(req).liftToTry
+          rep <- Future.const(decodeReq(bufToArray(muxReq.body))(reqCodec)).flatMap(
+            service
+          ).liftToTry
           body <- Future.const(encodeRep(rep)(repCodec))
         } yield mux.Response(arrayToBuf(body))
     }

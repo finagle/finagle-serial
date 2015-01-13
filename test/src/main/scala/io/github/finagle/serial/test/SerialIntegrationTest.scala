@@ -9,7 +9,8 @@ import org.scalatest.prop.Checkers
 import org.scalacheck.{Arbitrary, Gen, Prop}
 
 /**
- * Convenience trait for creating integration tests for Serial implementations.
+ * Convenience trait for creating integration tests for
+ * [[io.github.finagle.Serial]] implementations.
  */
 trait SerialIntegrationTest extends Checkers with Matchers { this: Serial =>
 
