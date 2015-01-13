@@ -26,13 +26,15 @@ class ScodecCodecSpec extends FlatSpec with Matchers {
   it should "work being used with Serial" in {
     implicit val fooCodec = int8.hlist.as[Foo]
 
-    val server = ScodecSerial.server[Foo, Foo].serve(
+    val serial = ScodecSerial[Foo, Foo]
+    val server = serial.serve(
       new InetSocketAddress(8124),
       new Service[Foo, Foo] {
         override def apply(x: Foo) = Future.value(Foo(x.x * x.x))
       }
     )
-    val service = ScodecSerial.client[Foo, Foo].newService("localhost:8124")
+
+    val service = serial.newService("localhost:8124")
 
     Await.result(service(Foo(10))) shouldBe Foo(100)
     Await.ready(server.close())

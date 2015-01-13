@@ -1,5 +1,6 @@
 package io.github.finagle
 
+import com.twitter.finagle
 import com.twitter.finagle._
 import com.twitter.finagle.client.StackClient
 import com.twitter.finagle.server.StackServer
@@ -38,11 +39,37 @@ trait Serial {
   def server[Req, Rep](implicit reqCodec: C[Req], repCodec: C[Rep]) =
     Server[Req, Rep](reqCodec, repCodec)
 
+  /**
+   * Returns an instance of [[finagle.Client]] with [[finagle.Server]]
+   * of concrete serial protocol from ''Req'' to ''Rep''.
+   *
+   * {{{
+   *   val server = Serial[Foo, Bar].serve(...)
+   *   val client = Serial[Foo, Bar].newService(...)
+   * }}}
+   *
+   * @param reqCodec the request codec
+   * @param repCodec the response codec
+   * @tparam Req the request type
+   * @tparam Rep the response type
+   */
+  def apply[Req, Rep](implicit reqCodec: C[Req], repCodec: C[Rep]) =
+    new finagle.Client[Req, Rep] with finagle.Server[Req, Rep] {
+      private val c = client(reqCodec, repCodec)
+      private val s = server(reqCodec, repCodec)
+
+      override def newClient(dest: Name, label: String) =
+        c.newClient(dest, label)
+
+      override def serve(addr: SocketAddress, service: ServiceFactory[Req, Rep]) =
+        s.serve(addr, service)
+    }
+
   case class Client[Req, Rep](
     reqCodec: C[Req],
     repCodec: C[Rep],
     muxer: StackClient[mux.Request, mux.Response] = Mux.client.copy(stack = BaseClientStack)
-  ) extends com.twitter.finagle.Client[Req, Rep]
+  ) extends finagle.Client[Req, Rep]
     with Stack.Parameterized[Client[Req, Rep]] {
 
     def params = muxer.params
@@ -65,7 +92,7 @@ trait Serial {
     reqCodec: C[Req],
     repCodec: C[Rep],
     muxer: StackServer[mux.Request, mux.Response] = Mux.server.copy(stack = BaseServerStack)
-  ) extends com.twitter.finagle.Server[Req, Rep]
+  ) extends finagle.Server[Req, Rep]
     with Stack.Parameterized[Server[Req, Rep]] {
 
     def params = muxer.params
