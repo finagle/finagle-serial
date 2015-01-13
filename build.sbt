@@ -67,6 +67,12 @@ lazy val benchmark = project
   .settings(publishSettings: _*)
   .settings(scodecSettings: _*)
   .settings(jmhSettings: _*)
+  .settings(
+    libraryDependencies ++= Seq(
+      "com.twitter" %% "finagle-thriftmux" % "6.24.0",
+      "com.twitter" %% "scrooge-core" % "3.17.0"
+    )
+  ).settings(com.twitter.scrooge.ScroogeSBT.newSettings: _*)
   .dependsOn(core, scodec)
 
 lazy val publishSettings = Seq(

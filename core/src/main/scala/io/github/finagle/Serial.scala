@@ -182,7 +182,7 @@ trait Serial {
           body <- Future.const(encodeRep(rep)(repCodec))
         } yield mux.Response(arrayToBuf(body))
     }
-    
+
     def serve(addr: SocketAddress, factory: ServiceFactory[Req, Rep]) =
       muxer.serve(addr, toMux andThen factory)
   }

@@ -28,8 +28,13 @@ object Workload {
   )
 
   object scodec {
-    implicit val smallCodec: Codec[Small] = (list(bool) :: utf8).as[Small]
-    implicit val mediumCodec: Codec[Medium] = (list(utf8) :: long(64) :: list(smallCodec)).as[Medium]
-    implicit val largeCodec: Codec[Large] = (list(uuid) :: list(mediumCodec)).as[Large]
+    val stringWithLength: Codec[String] = variableSizeBits(uint24, utf8)
+    def listWithLength[A](codec: Codec[A]) = listOfN(uint24, codec)
+
+    implicit val smallCodec: Codec[Small] = (listWithLength(bool) :: stringWithLength).as[Small]
+    implicit val mediumCodec: Codec[Medium] =
+      (listWithLength(stringWithLength) :: long(64) :: listWithLength(smallCodec)).as[Medium]
+    implicit val largeCodec: Codec[Large] =
+      (listWithLength(uuid) :: listWithLength(mediumCodec)).as[Large]
   }
 }
