@@ -20,6 +20,8 @@ class ScodecApplicationErrorIntegrationTest extends FunSuite with ScodecSerial
     val (server, client) = createServerAndClient[String, Int](_.toInt)
 
     an[NumberFormatException] should be thrownBy Await.result(client("not an integer"))
+
+    server.close()
   }
 
   test("A service should correctly wrap unhandled application errors") {
@@ -28,5 +30,7 @@ class ScodecApplicationErrorIntegrationTest extends FunSuite with ScodecSerial
     }
 
     an[ApplicationError] should be thrownBy Await.result(client("not an integer"))
+
+    server.close()
   }
 }

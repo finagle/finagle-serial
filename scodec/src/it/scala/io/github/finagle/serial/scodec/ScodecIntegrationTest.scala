@@ -41,6 +41,8 @@ class ScodecIntegrationTest extends FunSuite with ScodecSerial with SerialIntegr
     val (server, client) = createServerAndClient[Foo, Int](_.i)
 
     an[CodecError] should be thrownBy Await.result(client(Foo(Int.MaxValue, "foo")))
+
+    server.close()
   }
 
   test("A service should correctly throw encoding errors on the server side") {
@@ -49,5 +51,7 @@ class ScodecIntegrationTest extends FunSuite with ScodecSerial with SerialIntegr
     }
 
     an[CodecError] should be thrownBy Await.result(client(Foo(1, "foo")))
+
+    server.close()
   }
 }
