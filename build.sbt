@@ -36,7 +36,13 @@ lazy val test = project
 
 lazy val scodecSettings = Seq(
   resolvers += Resolver.sonatypeRepo("snapshots"),
-  libraryDependencies += "org.typelevel" %% "scodec-core" % "1.7.0-SNAPSHOT"
+  libraryDependencies += "org.typelevel" %% "scodec-core" % "1.7.0-SNAPSHOT",
+  // This is necessary for 2.10 because of Scodec's Shapeless dependency.
+  libraryDependencies ++= (
+    if (scalaBinaryVersion.value.startsWith("2.10")) Seq(
+      compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+    ) else Nil
+  )
 )
 
 lazy val scodec = project
