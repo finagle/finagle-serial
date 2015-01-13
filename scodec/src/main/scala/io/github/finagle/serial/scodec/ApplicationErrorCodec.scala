@@ -47,6 +47,10 @@ object ApplicationErrorCodec {
       case e: ArrayIndexOutOfBoundsException => e.getMessage
     }.add(new NullPointerException(_)) {
       case e: NullPointerException => e.getMessage
+    }.add(new IllegalArgumentException(_)) {
+      case e: IllegalArgumentException => e.getMessage
+    }.add(new NoSuchElementException(_)) {
+      case e: NoSuchElementException => e.getMessage
     }
 }
 
