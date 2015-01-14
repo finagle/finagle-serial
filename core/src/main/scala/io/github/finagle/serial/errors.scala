@@ -1,7 +1,5 @@
 package io.github.finagle.serial
 
-import com.twitter.util.Try
-
 /**
  * Represents an error that occurs during encoding or decoding.
  */

@@ -17,13 +17,28 @@ trait ScodecSerial extends Serial {
    */
   private[this] lazy val stringWithLength: Codec[String] = variableSizeBits(uint24, utf8)
 
+  /**
+   * A codec for encoding errors.
+   *
+   * Because encoding errors are sent over the wire, an implementation needs to
+   * specify how to encode them.
+   */
   lazy val codecErrorCodec: Codec[CodecError] = stringWithLength.hlist.as[CodecError]
 
+  /**
+   * A codec for "fall-back" errors.
+   *
+   * This will be used if [[io.github.finagle.Serial#applicationErrorCodec]]
+   * does not successfully encode an application error.
+   */
   lazy val unhandledApplicationErrorCodec: Codec[ApplicationError] =
     stringWithLength.hlist.as[ApplicationError]
 
   /**
-   * By default we only encode a few exceptions from the standard library.
+   * A codec for application errors.
+   *
+   * Implementations may decide which errors they wish to serialize. By default
+   * we only encode a few exceptions from the standard library.
    */
   lazy val applicationErrorCodec: Codec[Throwable] = ApplicationErrorCodec.basic.underlying
 

@@ -6,7 +6,6 @@ import com.twitter.finagle.client.StackClient
 import com.twitter.finagle.server.StackServer
 import com.twitter.io.Buf
 import com.twitter.util.{Future, Try}
-import io.github.finagle.serial._
 import java.net.SocketAddress
 import scala.language.higherKinds
 
@@ -19,29 +18,6 @@ trait Serial {
    * Represents a codec for a given type.
    */
   type C[_]
-
-  /**
-   * A codec for encoding errors.
-   *
-   * Because encoding errors are sent over the wire, an implementation needs to
-   * specify how to encode them.
-   */
-  def codecErrorCodec: C[CodecError]
-
-  /**
-   * A codec for "fall-back" errors.
-   *
-   * This will be used if [[io.github.finagle.Serial#applicationErrorCodec]]
-   * does not successfully encode an application error.
-   */
-  def unhandledApplicationErrorCodec: C[ApplicationError]
-
-  /**
-   * A codec for application errors.
-   *
-   * Implementations may decide which errors they wish to serialize.
-   */
-  def applicationErrorCodec: C[Throwable]
 
   /**
    * Encode a request.
