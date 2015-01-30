@@ -43,7 +43,7 @@ lazy val test = project
 
 lazy val scodecSettings = Seq(
   resolvers += Resolver.sonatypeRepo("snapshots"),
-  libraryDependencies += "org.typelevel" %% "scodec-core" % "1.7.0-SNAPSHOT",
+  libraryDependencies += "org.scodec" %% "scodec-core" % "1.8.0-SNAPSHOT",
   // This is necessary for 2.10 because of Scodec's Shapeless dependency.
   libraryDependencies ++= (
     if (scalaBinaryVersion.value.startsWith("2.10")) Seq(
