@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.org/finagle/finagle-serial.svg?branch=master)](https://travis-ci.org/finagle/finagle-serial)
+# Finagle Serial
+
+[![Build status](https://img.shields.io/travis/finagle/finagle-serial/master.svg)](http://travis-ci.org/finagle/finagle-serial) [![Coverage status](https://img.shields.io/coveralls/finagle/finagle-serial/master.svg)](https://coveralls.io/r/finagle/finagle-serial?branch=master)
 
 Finagle Serial supports the creation of [Finagle][1] servers and clients that
 use Scala (or Java) libraries for serialization instead of IDL-based systems
@@ -18,8 +20,7 @@ your choice. We currently provide support for [Scodec][6].
 * [Benchmarks](#benchmarks)
 * [License](#license)
 
-Quickstart
-----------
+## Quickstart
 
 Let's start with some simple case classes:
 
@@ -73,8 +74,7 @@ client(User("Mary")).onSuccess { greeting =>
 That's all! No plugins, no IDLs, no code generation, and very little
 boilerplate.
 
-Installation
-------------
+## Installation
 
 Serial is brand new and is not published to Maven Central at the moment (it will
 be soon), but for now you can check out this repository, run
@@ -84,8 +84,7 @@ be soon), but for now you can check out this repository, run
 libraryDependencies += "io.github.finagle" %% "finagle-serial-scodec" % "0.0.1"
 ```
 
-Error handling
---------------
+## Error handling
 
 The most straightforward way to take care of application error handling is
 simply to represent the possibility of error in your service's return type, and
@@ -143,8 +142,7 @@ Serial service:
     `ApplicationError` (assuming it can't return the exception thrown by your
     service).
 
-Testing
--------
+## Testing
 
 We provide a `SerialIntegrationTest` that makes it easy to use [ScalaCheck][8]
 to help verify that your serialization backend implementation is working
@@ -192,8 +190,7 @@ class ScodecIntegrationTest extends FunSuite with ScodecSerial with SerialIntegr
 
 Check the `test` project documentation for more information about these tools.
 
-Benchmarks
-----------
+## Benchmarks
 
 We also provide a very preliminary `benchmark` project that uses [JMH][9] to
 compare the performance of the Scodec backend to a similar Finagle Thrift
@@ -208,8 +205,7 @@ i.g.f.s.ScodecSmallRTBenchmark.test           thrpt       20   8607.848 ± 244.8
 These benchmarks (even more than most benchmarks) should be taken with a grain
 of salt, but will be refined as the project matures.
 
-License
--------
+## License
 
 Licensed under the **[Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)** (the "License");
 you may not use this software except in compliance with the License.
