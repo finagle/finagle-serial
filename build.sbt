@@ -1,3 +1,5 @@
+import scoverage.ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
+
 lazy val commonSettings = Seq(
   organization := "io.github.finagle",
   version := "0.0.1",
@@ -33,13 +35,16 @@ lazy val core = project
   .settings(moduleName := "finagle-serial-core")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
+  .disablePlugins(CoverallsPlugin)
 
 lazy val test = project
   .settings(moduleName := "finagle-serial-test")
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(libraryDependencies ++= testDependencies)
+  .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.test\\..*")
   .dependsOn(core)
+  .disablePlugins(CoverallsPlugin)
 
 lazy val scodecSettings = Seq(
   resolvers += Resolver.sonatypeRepo("snapshots"),
@@ -60,6 +65,7 @@ lazy val scodec = project
   .settings(publishSettings: _*)
   .settings(scodecSettings: _*)
   .dependsOn(core, test % "it")
+  .disablePlugins(CoverallsPlugin)
 
 lazy val benchmark = project
   .settings(moduleName := "finagle-serial-benchmark")
@@ -72,8 +78,11 @@ lazy val benchmark = project
       "com.twitter" %% "finagle-thriftmux" % "6.24.0",
       "com.twitter" %% "scrooge-core" % "3.17.0"
     )
-  ).settings(com.twitter.scrooge.ScroogeSBT.newSettings: _*)
+  )
+  .settings(com.twitter.scrooge.ScroogeSBT.newSettings: _*)
+  .settings(coverageExcludedPackages := "i\\.g\\.f\\.s\\..*")
   .dependsOn(core, scodec)
+  .disablePlugins(CoverallsPlugin)
 
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
