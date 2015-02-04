@@ -23,7 +23,7 @@ trait ScodecSerial extends Serial {
    * Because encoding errors are sent over the wire, an implementation needs to
    * specify how to encode them.
    */
-  lazy val codecErrorCodec: Codec[CodecError] = stringWithLength.hlist.as[CodecError]
+  lazy val codecErrorCodec: Codec[CodecError] = stringWithLength.as[CodecError]
 
   /**
    * A codec for "fall-back" errors.
@@ -32,7 +32,7 @@ trait ScodecSerial extends Serial {
    * does not successfully encode an application error.
    */
   lazy val unhandledApplicationErrorCodec: Codec[ApplicationError] =
-    stringWithLength.hlist.as[ApplicationError]
+    stringWithLength.as[ApplicationError]
 
   /**
    * A codec for application errors.
