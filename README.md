@@ -194,12 +194,12 @@ Check the `test` project documentation for more information about these tools.
 
 We also provide a very preliminary `benchmark` project that uses [JMH][9] to
 compare the performance of the Scodec backend to a similar Finagle Thrift
-service. In our initial testing, the Scodec backend manages about 40% of the
+service. In our initial testing, the Scodec backend manages about 46% of the
 throughput of the Thrift implementation:
 
 ```
-i.g.f.s.RoundTripThriftSmallBenchmark.test    thrpt       20  21221.289 ± 483.478  ops/s
-i.g.f.s.ScodecSmallRTBenchmark.test           thrpt       20   8607.848 ± 244.856  ops/s
+i.g.f.s.RoundTripThriftSmallBenchmark.test    thrpt       20  22422.923 ± 1098.352  ops/s
+i.g.f.s.ScodecSmallRTBenchmark.test           thrpt       20  10335.675 ± 190.058  ops/s
 ```
 
 These benchmarks (even more than most benchmarks) should be taken with a grain

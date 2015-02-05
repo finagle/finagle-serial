@@ -63,35 +63,28 @@ trait ScodecSerial extends Serial {
       o => o.value.fold(Throw(_), Return(_))
     )
 
-  private[this] def repMessageCodec[A](c: C[A]): Codec[
-    Either[Either[Either[CodecError, ApplicationError], Throwable], A]
-  ] = either(
-    bool,
-    either(
-      bool,
-      either(bool, codecErrorCodec, unhandledApplicationErrorCodec),
-      applicationErrorCodec
-    ),
-    c
-  )
-
   def encodeRep[A](t: Try[A])(c: C[A]): Try[Array[Byte]] = {
-    val message = t match {
-      case Return(a) => Right(a)
-      case Throw(e @ CodecError(_)) => Left(Left(Left(e)))
-      case Throw(e) => Left(Right(e))
+    val message: RepMessage[A] = t match {
+      case Return(a) => ContentRepMessage(a)
+      case Throw(e @ CodecError(_)) => CodecErrorRepMessage(e)
+      case Throw(e) => ApplicationErrorRepMessage(e)
     }
 
-    val codec = repMessageCodec(c)
+    val codec = RepMessage.codec(
+      c,
+      codecErrorCodec,
+      applicationErrorCodec,
+      unhandledApplicationErrorCodec
+    )
 
     codec.encode(message).fold(
       {
         case Err.MatchingDiscriminatorNotFound(t: Throwable, _) =>
-          codec.encode(Left(Left(Right(ApplicationError(t.toString))))).fold(
+          codec.encode(UnhandledApplicationErrorRepMessage(ApplicationError(t.toString))).fold(
             e => Throw(CodecError(e.message)),
             bits => Return(bits.toByteArray)
           )
-        case e => codec.encode(Left(Left(Left(CodecError(e.message))))).fold(
+        case e => codec.encode(CodecErrorRepMessage(CodecError(e.message))).fold(
           e => Throw(CodecError(e.message)),
           bits => Return(bits.toByteArray)
         )
@@ -101,9 +94,14 @@ trait ScodecSerial extends Serial {
   }
 
   def decodeRep[A](bytes: Array[Byte])(c: C[A]): Try[A] =
-    repMessageCodec(c).decode(BitVector(bytes)).fold(
+    RepMessage.codec(
+      c,
+      codecErrorCodec,
+      applicationErrorCodec,
+      unhandledApplicationErrorCodec
+    ).decode(BitVector(bytes)).fold(
       e => Throw(CodecError(e.message)),
-      o => o.value.fold(_.fold(_.fold(Throw(_), Throw(_)), Throw(_)), Return(_))
+      o => o.value.toTry
     )
 }
 
