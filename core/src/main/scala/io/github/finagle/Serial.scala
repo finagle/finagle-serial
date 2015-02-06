@@ -20,13 +20,18 @@ trait Serial {
   type C[_]
 
   /**
+   * The codec's native byte buffer (or array) representation.
+   */
+  type Bytes
+
+  /**
    * Encode a request.
    *
    * A "well-behaved" implementation should only fail with instances of
    * [[io.github.finagle.serial.CodecError]]; all other errors will result in
    * an [[com.twitter.finagle.mux.ServerApplicationError]] being returned.
    */
-  def encodeReq[A](a: A)(c: C[A]): Try[Array[Byte]]
+  def encodeReq[A](a: A)(c: C[A]): Try[Bytes]
 
   /**
    * Decode a request.
@@ -34,17 +39,15 @@ trait Serial {
    * An implementation should decode [[io.github.finagle.serial.CodecError]] and
    * return instances as an error.
    */
-  def decodeReq[A](bytes: Array[Byte])(c: C[A]): Try[A]
+  def decodeReq[A](bytes: Bytes)(c: C[A]): Try[A]
 
   /**
    * Encode a result.
    *
    * An implementation should fail with [[io.github.finagle.serial.CodecError]]
-   * in the event of a encoding error. It should attempt to encode application
-   * errors with [[io.github.finagle.Serial#applicationErrorCodec]], and if that
-   * fails should return an [[io.github.finagle.serial.ApplicationError]].
+   * in the event of a encoding error.
    */
-  def encodeRep[A](t: Try[A])(c: C[A]): Try[Array[Byte]]
+  def encodeRep[A](t: Try[A])(c: C[A]): Try[Bytes]
 
   /**
    * Decode a result.
@@ -52,10 +55,19 @@ trait Serial {
    * An implementation should deserialize the errors returned its
    * [[io.github.finagle.Serial#encodeRep]].
    */
-  def decodeRep[A](bytes: Array[Byte])(c: C[A]): Try[A]
+  def decodeRep[A](bytes: Bytes)(c: C[A]): Try[A]
 
-  private def arrayToBuf(array: Array[Byte]) = Buf.ByteArray.Owned(array)
-  private def bufToArray(buf: Buf) = Buf.ByteArray.Owned.extract(buf)
+  /**
+   * Convert the implementation's representation of a byte buffer to a
+   * [[com.twitter.io.Buf]].
+   */
+  def toBuf(bytes: Bytes): Buf
+
+  /**
+   * Convert a [[com.twitter.io.Buf]] to this implementation's byte buffer
+   * representation.
+   */
+  def fromBuf(buf: Buf): Bytes
 
   private val BaseClientStack = Mux.client.stack
   private val BaseServerStack = Mux.server.stack
@@ -129,8 +141,8 @@ trait Serial {
     private[this] val fromMux = new Filter[Req, Rep, mux.Request, mux.Response] {
       def apply(req: Req, service: Service[mux.Request, mux.Response]): Future[Rep] = for {
         body <- Future.const(encodeReq(req)(reqCodec))
-        muxRep <- service(mux.Request(Path.empty, arrayToBuf(body)))
-        out <- Future.const(decodeRep(bufToArray(muxRep.body))(repCodec))
+        muxRep <- service(mux.Request(Path.empty, toBuf(body)))
+        out <- Future.const(decodeRep(fromBuf(muxRep.body))(repCodec))
       } yield out
     }
 
@@ -152,11 +164,11 @@ trait Serial {
     private[this] val toMux = new Filter[mux.Request, mux.Response, Req, Rep] {
       def apply(muxReq: mux.Request, service: Service[Req, Rep]): Future[mux.Response] =
         for {
-          rep <- Future.const(decodeReq(bufToArray(muxReq.body))(reqCodec)).flatMap(
+          rep <- Future.const(decodeReq(fromBuf(muxReq.body))(reqCodec)).flatMap(
             service
           ).liftToTry
           body <- Future.const(encodeRep(rep)(repCodec))
-        } yield mux.Response(arrayToBuf(body))
+        } yield mux.Response(toBuf(body))
     }
 
     def serve(addr: SocketAddress, factory: ServiceFactory[Req, Rep]) =
