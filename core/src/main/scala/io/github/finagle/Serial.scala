@@ -85,9 +85,22 @@ trait Serial {
     Server[Req, Rep](reqCodec, repCodec)
 
   /**
-   * Returns an instance of [[com.twitter.finagle.Client]] with
-   * [[com.twitter.finagle.Server]] of concrete serial protocol from ''Req'' to
-   * ''Rep''.
+   * A concrete Serial protocol instance from 'Req'' to ''Rep''.
+   */
+  trait Protocol[Req, Rep] extends finagle.Client[Req, Rep] with finagle.Server[Req, Rep] {
+    /**
+     * A convenience method that creates a server from a function.
+     */
+    def serveFunction(addr: SocketAddress)(f: Req => Rep): ListeningServer = serve(
+      addr,
+      new Service[Req, Rep] {
+        def apply(req: Req): Future[Rep] = Future.value(f(req))
+      }
+    )
+  }
+
+  /**
+   * Returns an instance of a concrete serial protocol from ''Req'' to ''Rep''.
    *
    * {{{
    *   val server = Serial[Foo, Bar].serve(...)
@@ -99,10 +112,10 @@ trait Serial {
    * @tparam Req the request type
    * @tparam Rep the response type
    */
-  def apply[Req, Rep](implicit reqCodec: C[Req], repCodec: C[Rep]) =
-    new finagle.Client[Req, Rep] with finagle.Server[Req, Rep] {
-      private val c = client(reqCodec, repCodec)
-      private val s = server(reqCodec, repCodec)
+  def apply[Req, Rep](implicit reqCodec: C[Req], repCodec: C[Rep]): Protocol[Req, Rep] =
+    new Protocol[Req, Rep] {
+      private[this] val c = client(reqCodec, repCodec)
+      private[this] val s = server(reqCodec, repCodec)
 
       override def newClient(dest: Name, label: String) =
         c.newClient(dest, label)

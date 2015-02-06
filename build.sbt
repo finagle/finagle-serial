@@ -33,7 +33,6 @@ lazy val root = project.in(file("."))
   )
   .aggregate(core, test, scodec, benchmark)
 
-
 lazy val core = project
   .settings(moduleName := "finagle-serial-core")
   .settings(commonSettings: _*)
