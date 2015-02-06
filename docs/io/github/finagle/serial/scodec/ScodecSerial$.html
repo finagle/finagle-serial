@@ -93,7 +93,25 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="io.github.finagle.serial.scodec.ScodecSerial.C" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+              <ol><li name="io.github.finagle.serial.scodec.ScodecSerial.Bytes" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="Bytes=scodec.bits.BitVector"></a>
+      <a id="Bytes:Bytes"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Bytes</span><span class="result"> = <span class="extype" name="scodec.bits.BitVector">BitVector</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@Bytes=scodec.bits.BitVector" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">The codec's native byte buffer (or array) representation.</p><div class="fullcomment"><div class="comment cmt"><p>The codec's native byte buffer (or array) representation.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ScodecSerial.html" class="extype" name="io.github.finagle.serial.scodec.ScodecSerial">ScodecSerial</a> → <a href="../../Serial.html" class="extype" name="io.github.finagle.Serial">Serial</a></dd></dl></div>
+    </li><li name="io.github.finagle.serial.scodec.ScodecSerial.C" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="C[A]=scodec.Codec[A]"></a>
       <a id="C[A]:C[A]"></a>
       <h4 class="signature">
@@ -323,37 +341,37 @@ we only encode a few exceptions from the standard library.
 specify how to encode them.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ScodecSerial.html" class="extype" name="io.github.finagle.serial.scodec.ScodecSerial">ScodecSerial</a></dd></dl></div>
     </li><li name="io.github.finagle.serial.scodec.ScodecSerial#decodeRep" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="decodeRep[A](bytes:Array[Byte])(c:ScodecSerial.this.C[A]):com.twitter.util.Try[A]"></a>
-      <a id="decodeRep[A](Array[Byte])(C[A]):Try[A]"></a>
+      <a id="decodeRep[A](bytes:scodec.bits.BitVector)(c:scodec.Codec[A]):com.twitter.util.Try[A]"></a>
+      <a id="decodeRep[A](BitVector)(Codec[A]):Try[A]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">decodeRep</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="bytes">bytes: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="params">(<span name="c">c: <a href="#C[A]=scodec.Codec[A]" class="extmbr" name="io.github.finagle.serial.scodec.ScodecSerial.C">C</a>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.decodeRep.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.decodeRep.A">A</span>]</span>
+        <span class="name">decodeRep</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="bytes">bytes: <span class="extype" name="scodec.bits.BitVector">BitVector</span></span>)</span><span class="params">(<span name="c">c: <span class="extype" name="scodec.Codec">Codec</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.decodeRep.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.decodeRep.A">A</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@decodeRep[A](bytes:Array[Byte])(c:ScodecSerial.this.C[A]):com.twitter.util.Try[A]" title="Permalink" target="_top">
+      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@decodeRep[A](bytes:scodec.bits.BitVector)(c:scodec.Codec[A]):com.twitter.util.Try[A]" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
       <p class="shortcomment cmt">Decode a result.</p><div class="fullcomment"><div class="comment cmt"><p>Decode a result.</p><p>An implementation should deserialize the errors returned its
-<a href="../../Serial.html#encodeRep[A](t:com.twitter.util.Try[A])(c:Serial.this.C[A]):com.twitter.util.Try[Array[Byte]]" class="extmbr" name="io.github.finagle.Serial#encodeRep">io.github.finagle.Serial#encodeRep</a>.
+<a href="../../Serial.html#encodeRep[A](t:com.twitter.util.Try[A])(c:Serial.this.C[A]):com.twitter.util.Try[Serial.this.Bytes]" class="extmbr" name="io.github.finagle.Serial#encodeRep">io.github.finagle.Serial#encodeRep</a>.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ScodecSerial.html" class="extype" name="io.github.finagle.serial.scodec.ScodecSerial">ScodecSerial</a> → <a href="../../Serial.html" class="extype" name="io.github.finagle.Serial">Serial</a></dd></dl></div>
     </li><li name="io.github.finagle.serial.scodec.ScodecSerial#decodeReq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="decodeReq[A](bytes:Array[Byte])(c:ScodecSerial.this.C[A]):com.twitter.util.Try[A]"></a>
-      <a id="decodeReq[A](Array[Byte])(C[A]):Try[A]"></a>
+      <a id="decodeReq[A](bytes:scodec.bits.BitVector)(c:scodec.Codec[A]):com.twitter.util.Try[A]"></a>
+      <a id="decodeReq[A](BitVector)(Codec[A]):Try[A]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">decodeReq</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="bytes">bytes: <span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]</span>)</span><span class="params">(<span name="c">c: <a href="#C[A]=scodec.Codec[A]" class="extmbr" name="io.github.finagle.serial.scodec.ScodecSerial.C">C</a>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.decodeReq.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.decodeReq.A">A</span>]</span>
+        <span class="name">decodeReq</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="bytes">bytes: <span class="extype" name="scodec.bits.BitVector">BitVector</span></span>)</span><span class="params">(<span name="c">c: <span class="extype" name="scodec.Codec">Codec</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.decodeReq.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.decodeReq.A">A</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@decodeReq[A](bytes:Array[Byte])(c:ScodecSerial.this.C[A]):com.twitter.util.Try[A]" title="Permalink" target="_top">
+      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@decodeReq[A](bytes:scodec.bits.BitVector)(c:scodec.Codec[A]):com.twitter.util.Try[A]" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -361,39 +379,37 @@ specify how to encode them.
 return instances as an error.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ScodecSerial.html" class="extype" name="io.github.finagle.serial.scodec.ScodecSerial">ScodecSerial</a> → <a href="../../Serial.html" class="extype" name="io.github.finagle.Serial">Serial</a></dd></dl></div>
     </li><li name="io.github.finagle.serial.scodec.ScodecSerial#encodeRep" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="encodeRep[A](t:com.twitter.util.Try[A])(c:ScodecSerial.this.C[A]):com.twitter.util.Try[Array[Byte]]"></a>
-      <a id="encodeRep[A](Try[A])(C[A]):Try[Array[Byte]]"></a>
+      <a id="encodeRep[A](t:com.twitter.util.Try[A])(c:scodec.Codec[A]):com.twitter.util.Try[scodec.bits.BitVector]"></a>
+      <a id="encodeRep[A](Try[A])(Codec[A]):Try[BitVector]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">encodeRep</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="t">t: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.encodeRep.A">A</span>]</span>)</span><span class="params">(<span name="c">c: <a href="#C[A]=scodec.Codec[A]" class="extmbr" name="io.github.finagle.serial.scodec.ScodecSerial.C">C</a>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.encodeRep.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]]</span>
+        <span class="name">encodeRep</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="t">t: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.encodeRep.A">A</span>]</span>)</span><span class="params">(<span name="c">c: <span class="extype" name="scodec.Codec">Codec</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.encodeRep.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="scodec.bits.BitVector">BitVector</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@encodeRep[A](t:com.twitter.util.Try[A])(c:ScodecSerial.this.C[A]):com.twitter.util.Try[Array[Byte]]" title="Permalink" target="_top">
+      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@encodeRep[A](t:com.twitter.util.Try[A])(c:scodec.Codec[A]):com.twitter.util.Try[scodec.bits.BitVector]" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
       <p class="shortcomment cmt">Encode a result.</p><div class="fullcomment"><div class="comment cmt"><p>Encode a result.</p><p>An implementation should fail with <a href="../CodecError.html" class="extype" name="io.github.finagle.serial.CodecError">io.github.finagle.serial.CodecError</a>
-in the event of a encoding error. It should attempt to encode application
-errors with <span class="extype" name="io.github.finagle.Serial#applicationErrorCodec">io.github.finagle.Serial#applicationErrorCodec</span>, and if that
-fails should return an <a href="../ApplicationError.html" class="extype" name="io.github.finagle.serial.ApplicationError">io.github.finagle.serial.ApplicationError</a>.
+in the event of a encoding error.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ScodecSerial.html" class="extype" name="io.github.finagle.serial.scodec.ScodecSerial">ScodecSerial</a> → <a href="../../Serial.html" class="extype" name="io.github.finagle.Serial">Serial</a></dd></dl></div>
     </li><li name="io.github.finagle.serial.scodec.ScodecSerial#encodeReq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="encodeReq[A](a:A)(c:ScodecSerial.this.C[A]):com.twitter.util.Try[Array[Byte]]"></a>
-      <a id="encodeReq[A](A)(C[A]):Try[Array[Byte]]"></a>
+      <a id="encodeReq[A](a:A)(c:scodec.Codec[A]):com.twitter.util.Try[scodec.bits.BitVector]"></a>
+      <a id="encodeReq[A](A)(Codec[A]):Try[BitVector]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">encodeReq</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.encodeReq.A">A</span></span>)</span><span class="params">(<span name="c">c: <a href="#C[A]=scodec.Codec[A]" class="extmbr" name="io.github.finagle.serial.scodec.ScodecSerial.C">C</a>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.encodeReq.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="scala.Array">Array</span>[<span class="extype" name="scala.Byte">Byte</span>]]</span>
+        <span class="name">encodeReq</span><span class="tparams">[<span name="A">A</span>]</span><span class="params">(<span name="a">a: <span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.encodeReq.A">A</span></span>)</span><span class="params">(<span name="c">c: <span class="extype" name="scodec.Codec">Codec</span>[<span class="extype" name="io.github.finagle.serial.scodec.ScodecSerial.encodeReq.A">A</span>]</span>)</span><span class="result">: <span class="extype" name="com.twitter.util.Try">Try</span>[<span class="extype" name="scodec.bits.BitVector">BitVector</span>]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@encodeReq[A](a:A)(c:ScodecSerial.this.C[A]):com.twitter.util.Try[Array[Byte]]" title="Permalink" target="_top">
+      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@encodeReq[A](a:A)(c:scodec.Codec[A]):com.twitter.util.Try[scodec.bits.BitVector]" title="Permalink" target="_top">
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
@@ -458,6 +474,26 @@ an <span class="extype" name="com.twitter.finagle.mux.ServerApplicationError">co
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="io.github.finagle.serial.scodec.ScodecSerial#fromBuf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="fromBuf(buf:com.twitter.io.Buf):scodec.bits.BitVector"></a>
+      <a id="fromBuf(Buf):BitVector"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">fromBuf</span><span class="params">(<span name="buf">buf: <span class="extype" name="com.twitter.io.Buf">Buf</span></span>)</span><span class="result">: <span class="extype" name="scodec.bits.BitVector">BitVector</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@fromBuf(buf:com.twitter.io.Buf):scodec.bits.BitVector" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Convert a <span class="extype" name="com.twitter.io.Buf">com.twitter.io.Buf</span> to this implementation's byte buffer
+representation.</p><div class="fullcomment"><div class="comment cmt"><p>Convert a <span class="extype" name="com.twitter.io.Buf">com.twitter.io.Buf</span> to this implementation's byte buffer
+representation.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ScodecSerial.html" class="extype" name="io.github.finagle.serial.scodec.ScodecSerial">ScodecSerial</a> → <a href="../../Serial.html" class="extype" name="io.github.finagle.Serial">Serial</a></dd></dl></div>
     </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <a id="getClass():Class[_]"></a>
@@ -613,6 +649,26 @@ an <span class="extype" name="com.twitter.finagle.mux.ServerApplicationError">co
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="io.github.finagle.serial.scodec.ScodecSerial#toBuf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toBuf(bytes:scodec.bits.BitVector):com.twitter.io.Buf"></a>
+      <a id="toBuf(BitVector):Buf"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toBuf</span><span class="params">(<span name="bytes">bytes: <span class="extype" name="scodec.bits.BitVector">BitVector</span></span>)</span><span class="result">: <span class="extype" name="com.twitter.io.Buf">Buf</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../../../index.html#io.github.finagle.serial.scodec.ScodecSerial$@toBuf(bytes:scodec.bits.BitVector):com.twitter.io.Buf" title="Permalink" target="_top">
+        <img src="../../../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Convert the implementation's representation of a byte buffer to a
+<span class="extype" name="com.twitter.io.Buf">com.twitter.io.Buf</span>.</p><div class="fullcomment"><div class="comment cmt"><p>Convert the implementation's representation of a byte buffer to a
+<span class="extype" name="com.twitter.io.Buf">com.twitter.io.Buf</span>.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ScodecSerial.html" class="extype" name="io.github.finagle.serial.scodec.ScodecSerial">ScodecSerial</a> → <a href="../../Serial.html" class="extype" name="io.github.finagle.Serial">Serial</a></dd></dl></div>
     </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <a id="toString():String"></a>
@@ -646,7 +702,7 @@ an <span class="extype" name="com.twitter.finagle.mux.ServerApplicationError">co
         <img src="../../../../../lib/permalink.png" />
       </a>
     </span>
-      <p class="shortcomment cmt">A codec for &quot;fall-back&quot; errors.</p><div class="fullcomment"><div class="comment cmt"><p>A codec for &quot;fall-back&quot; errors.</p><p>This will be used if <span class="extype" name="io.github.finagle.Serial#applicationErrorCodec">io.github.finagle.Serial#applicationErrorCodec</span>
+      <p class="shortcomment cmt">A codec for &quot;fall-back&quot; errors.</p><div class="fullcomment"><div class="comment cmt"><p>A codec for &quot;fall-back&quot; errors.</p><p>This will be used if <a href="ScodecSerial.html#applicationErrorCodec:scodec.Codec[Throwable]" class="extmbr" name="io.github.finagle.serial.scodec.ScodecSerial#applicationErrorCodec">applicationErrorCodec</a>
 does not successfully encode an application error.
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="ScodecSerial.html" class="extype" name="io.github.finagle.serial.scodec.ScodecSerial">ScodecSerial</a></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
