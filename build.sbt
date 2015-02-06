@@ -1,3 +1,4 @@
+import UnidocKeys._
 import scoverage.ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 
 lazy val commonSettings = Seq(
@@ -23,11 +24,13 @@ lazy val root = project.in(file("."))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(unidocSettings: _*)
-  .settings {
-    import UnidocKeys._
-
-    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmark)
-  }
+  .settings(site.settings: _*)
+  .settings(ghpages.settings: _*)
+  .settings(
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmark),
+    site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "docs"),
+    git.remoteRepo := "git@github.com:finagle/finagle-serial.git"
+  )
   .aggregate(core, test, scodec, benchmark)
 
 
@@ -98,6 +101,8 @@ lazy val publishSettings = Seq(
   publishArtifact in Test := false,
   licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   homepage := Some(url("https://github.com/finagle/finagle-serial")),
+  autoAPIMappings := true,
+  apiURL := Some(url("https://finagle.github.io/finagle-serial/docs/")),
   pomExtra := (
     <scm>
       <url>git://github.com/finagle/finagle-serial.git</url>
