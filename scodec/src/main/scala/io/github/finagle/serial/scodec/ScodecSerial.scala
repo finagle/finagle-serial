@@ -3,12 +3,14 @@ package io.github.finagle.serial.scodec
 import _root_.scodec.{Codec, Err}
 import _root_.scodec.bits.BitVector
 import _root_.scodec.codecs._
+import com.twitter.io.Buf
 import com.twitter.util.{Return, Throw, Try}
 import io.github.finagle.Serial
 import io.github.finagle.serial.{CodecError, ApplicationError}
 
 trait ScodecSerial extends Serial {
   type C[A] = Codec[A]
+  type Bytes = BitVector
 
   /**
    * A codec for error message strings.
@@ -28,7 +30,7 @@ trait ScodecSerial extends Serial {
   /**
    * A codec for "fall-back" errors.
    *
-   * This will be used if [[io.github.finagle.Serial#applicationErrorCodec]]
+   * This will be used if [[applicationErrorCodec]]
    * does not successfully encode an application error.
    */
   lazy val unhandledApplicationErrorCodec: Codec[ApplicationError] =
@@ -42,28 +44,28 @@ trait ScodecSerial extends Serial {
    */
   lazy val applicationErrorCodec: Codec[Throwable] = ApplicationErrorCodec.basic.underlying
 
-  private[this] def reqMessageCodec[A](c: C[A]): Codec[Either[CodecError, A]] =
+  private[this] def reqMessageCodec[A](c: Codec[A]): Codec[Either[CodecError, A]] =
     either(bool, codecErrorCodec, c)
 
-  def encodeReq[A](a: A)(c: C[A]): Try[Array[Byte]] = {
+  def encodeReq[A](a: A)(c: Codec[A]): Try[BitVector] = {
     val codec = reqMessageCodec(c)
 
     codec.encode(Right(a)).fold(
       e => codec.encode(Left(CodecError(e.message))).fold(
         e => Throw(CodecError(e.message)),
-        bits => Return(bits.toByteArray)
+        bits => Return(bits)
       ),
-      bits => Return(bits.toByteArray)
+      bits => Return(bits)
     )
   }
 
-  def decodeReq[A](bytes: Array[Byte])(c: C[A]): Try[A] =
-    reqMessageCodec(c).decode(BitVector(bytes)).fold(
+  def decodeReq[A](bytes: BitVector)(c: Codec[A]): Try[A] =
+    reqMessageCodec(c).decode(bytes).fold(
       e => Throw(CodecError(e.message)),
       o => o.value.fold(Throw(_), Return(_))
     )
 
-  def encodeRep[A](t: Try[A])(c: C[A]): Try[Array[Byte]] = {
+  def encodeRep[A](t: Try[A])(c: Codec[A]): Try[BitVector] = {
     val message: RepMessage[A] = t match {
       case Return(a) => ContentRepMessage(a)
       case Throw(e @ CodecError(_)) => CodecErrorRepMessage(e)
@@ -82,27 +84,30 @@ trait ScodecSerial extends Serial {
         case Err.MatchingDiscriminatorNotFound(t: Throwable, _) =>
           codec.encode(UnhandledApplicationErrorRepMessage(ApplicationError(t.toString))).fold(
             e => Throw(CodecError(e.message)),
-            bits => Return(bits.toByteArray)
+            bits => Return(bits)
           )
         case e => codec.encode(CodecErrorRepMessage(CodecError(e.message))).fold(
           e => Throw(CodecError(e.message)),
-          bits => Return(bits.toByteArray)
+          bits => Return(bits)
         )
       },
-      bits => Return(bits.toByteArray)
+      bits => Return(bits)
     )
   }
 
-  def decodeRep[A](bytes: Array[Byte])(c: C[A]): Try[A] =
+  def decodeRep[A](bytes: BitVector)(c: Codec[A]): Try[A] =
     RepMessage.codec(
       c,
       codecErrorCodec,
       applicationErrorCodec,
       unhandledApplicationErrorCodec
-    ).decode(BitVector(bytes)).fold(
+    ).decode(bytes).fold(
       e => Throw(CodecError(e.message)),
       o => o.value.toTry
     )
+
+  def toBuf(bytes: BitVector): Buf = Buf.ByteArray.Owned(bytes.toByteArray)
+  def fromBuf(buf: Buf): BitVector = BitVector(Buf.ByteArray.Owned.extract(buf))
 }
 
 object ScodecSerial extends ScodecSerial
