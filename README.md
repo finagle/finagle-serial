@@ -13,6 +13,7 @@ serialization (the _presentation layer_, to use the terminology of the
 [OSI model][5]) supplied by a pluggable wrapper for the serialization library of
 your choice. We currently provide support for [Scodec][6].
 
+* [API documentation](https://finagle.github.io/finagle-serial/docs/)
 * [Quickstart](#quick-start)
 * [Installation](#installation)
 * [Error handling](#error-handling)
