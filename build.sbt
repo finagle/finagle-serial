@@ -4,8 +4,8 @@ import scoverage.ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 lazy val commonSettings = Seq(
   organization := "io.github.finagle",
   version := "0.0.1",
-  scalaVersion := "2.11.5",
-  crossScalaVersions := Seq("2.10.4", "2.11.5"),
+  scalaVersion := "2.11.6",
+  crossScalaVersions := Seq("2.10.5", "2.11.6"),
   libraryDependencies ++= Seq(
     "com.twitter" %% "finagle-mux" % "6.24.0"
   ) ++ testDependencies.map(_ % "test"),
@@ -15,17 +15,14 @@ lazy val commonSettings = Seq(
 )
 
 lazy val testDependencies = Seq(
-  "org.scalatest" %% "scalatest" % "2.2.3",
-  "org.scalacheck" %% "scalacheck" % "1.12.1"
+  "org.scalatest" %% "scalatest" % "2.2.4",
+  "org.scalacheck" %% "scalacheck" % "1.12.2"
 )
 
 lazy val root = project.in(file("."))
   .settings(moduleName := "finagle-serial")
-  .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
-  .settings(unidocSettings: _*)
-  .settings(site.settings: _*)
-  .settings(ghpages.settings: _*)
+  .settings(commonSettings ++ publishSettings)
+  .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmark),
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "docs"),
@@ -35,22 +32,19 @@ lazy val root = project.in(file("."))
 
 lazy val core = project
   .settings(moduleName := "finagle-serial-core")
-  .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
+  .settings(commonSettings ++ publishSettings)
   .disablePlugins(CoverallsPlugin)
 
 lazy val test = project
   .settings(moduleName := "finagle-serial-test")
-  .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
+  .settings(commonSettings ++ publishSettings)
   .settings(libraryDependencies ++= testDependencies)
   .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.test\\..*")
   .dependsOn(core)
   .disablePlugins(CoverallsPlugin)
 
 lazy val scodecSettings = Seq(
-  resolvers += Resolver.sonatypeRepo("snapshots"),
-  libraryDependencies += "org.scodec" %% "scodec-core" % "1.8.0-SNAPSHOT",
+  libraryDependencies += "org.scodec" %% "scodec-core" % "1.7.1",
   // This is necessary for 2.10 because of Scodec's Shapeless dependency.
   libraryDependencies ++= (
     if (scalaBinaryVersion.value.startsWith("2.10")) Seq(
@@ -62,19 +56,13 @@ lazy val scodecSettings = Seq(
 lazy val scodec = project
   .settings(moduleName := "finagle-serial-scodec")
   .configs(IntegrationTest)
-  .settings(Defaults.itSettings: _*)
-  .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
-  .settings(scodecSettings: _*)
+  .settings(commonSettings ++ publishSettings ++ scodecSettings ++ Defaults.itSettings)
   .dependsOn(core, test % "it")
   .disablePlugins(CoverallsPlugin)
 
 lazy val benchmark = project
   .settings(moduleName := "finagle-serial-benchmark")
-  .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
-  .settings(scodecSettings: _*)
-  .settings(jmhSettings: _*)
+  .settings(commonSettings ++ publishSettings ++ scodecSettings ++ jmhSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twitter" %% "finagle-thriftmux" % "6.24.0",
