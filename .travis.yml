@@ -9,8 +9,10 @@ jdk:
   - oraclejdk7
   - oraclejdk8
 
+before_script: travis_retry sbt ++$TRAVIS_SCALA_VERSION update
+
 script:
-  - travis_retry sbt ++$TRAVIS_SCALA_VERSION coverage test it:test
+  - sbt ++$TRAVIS_SCALA_VERSION coverage test it:test
 
 after_success:
   - sbt coveralls
