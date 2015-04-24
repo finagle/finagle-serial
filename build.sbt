@@ -7,7 +7,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.11.6",
   crossScalaVersions := Seq("2.10.5", "2.11.6"),
   libraryDependencies ++= Seq(
-    "com.twitter" %% "finagle-mux" % "6.24.0"
+    "com.twitter" %% "finagle-mux" % "6.25.0"
   ) ++ testDependencies.map(_ % "test"),
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
   resolvers += "Twitter's Repository" at "http://maven.twttr.com/",
@@ -65,7 +65,7 @@ lazy val benchmark = project
   .settings(commonSettings ++ publishSettings ++ scodecSettings ++ jmhSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.twitter" %% "finagle-thriftmux" % "6.24.0",
+      "com.twitter" %% "finagle-thriftmux" % "6.25.0",
       "com.twitter" %% "scrooge-core" % "3.17.0"
     )
   )

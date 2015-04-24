@@ -117,6 +117,9 @@ trait Serial {
       private[this] val c = client(reqCodec, repCodec)
       private[this] val s = server(reqCodec, repCodec)
 
+      def newService(dest: Name, label: String): Service[Req, Rep] =
+        c.newService(dest, label)
+
       override def newClient(dest: Name, label: String) =
         c.newClient(dest, label)
 
@@ -161,6 +164,9 @@ trait Serial {
 
     def newClient(dest: Name, label: String): ServiceFactory[Req, Rep] =
       fromMux andThen muxer.newClient(dest, label)
+
+    def newService(dest: Name, label: String): Service[Req, Rep] =
+      fromMux andThen muxer.newService(dest, label)
   }
 
   case class Server[Req, Rep](
