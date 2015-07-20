@@ -1,22 +1,43 @@
 import UnidocKeys._
 import scoverage.ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 
+lazy val compilerOptions = Seq(
+  "-deprecation",
+  "-encoding", "UTF-8",
+  "-feature",
+  "-language:existentials",
+  "-language:higherKinds",
+  "-language:implicitConversions",
+  "-unchecked",
+  "-Yno-adapted-args",
+  "-Ywarn-dead-code",
+  "-Ywarn-numeric-widen",
+  "-Xfuture",
+  "-Xlint"
+)
+
 lazy val commonSettings = Seq(
   organization := "io.github.finagle",
   version := "0.0.1",
-  scalaVersion := "2.11.6",
-  crossScalaVersions := Seq("2.10.5", "2.11.6"),
+  scalaVersion := "2.11.7",
+  crossScalaVersions := Seq("2.10.5", "2.11.7"),
   libraryDependencies ++= Seq(
-    "com.twitter" %% "finagle-mux" % "6.25.0"
+    "com.twitter" %% "finagle-mux" % "6.26.0"
   ) ++ testDependencies.map(_ % "test"),
-  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature"),
-  resolvers += "Twitter's Repository" at "http://maven.twttr.com/",
+  scalacOptions ++= compilerOptions ++ (
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 11)) => Seq("-Ywarn-unused-import")
+      case _ => Seq.empty
+    }
+  ),
+  scalacOptions in (Compile, console) := compilerOptions,
+  resolvers += "Twitter's Repository" at "https://maven.twttr.com/",
   parallelExecution in Test := false
 )
 
 lazy val testDependencies = Seq(
-  "org.scalatest" %% "scalatest" % "2.2.4",
-  "org.scalacheck" %% "scalacheck" % "1.12.2"
+  "org.scalacheck" %% "scalacheck" % "1.12.4",
+  "org.scalatest" %% "scalatest" % "2.2.5"
 )
 
 lazy val root = project.in(file("."))
@@ -28,7 +49,18 @@ lazy val root = project.in(file("."))
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "docs"),
     git.remoteRepo := "git@github.com:finagle/finagle-serial.git"
   )
+  .settings(
+    initialCommands in console :=
+      """
+        |import com.twitter.finagle.Service
+        |import com.twitter.util.Future
+        |import io.github.finagle.serial.scodec.ScodecSerial
+        |import scodec.Codec
+        |import scodec.codecs._
+      """.stripMargin
+  )
   .aggregate(core, test, scodec, benchmark)
+  .dependsOn(core, scodec)
 
 lazy val core = project
   .settings(moduleName := "finagle-serial-core")
@@ -44,7 +76,7 @@ lazy val test = project
   .disablePlugins(CoverallsPlugin)
 
 lazy val scodecSettings = Seq(
-  libraryDependencies += "org.scodec" %% "scodec-core" % "1.7.1",
+  libraryDependencies += "org.scodec" %% "scodec-core" % "1.8.1",
   // This is necessary for 2.10 because of Scodec's Shapeless dependency.
   libraryDependencies ++= (
     if (scalaBinaryVersion.value.startsWith("2.10")) Seq(
@@ -65,7 +97,7 @@ lazy val benchmark = project
   .settings(commonSettings ++ publishSettings ++ scodecSettings ++ jmhSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.twitter" %% "finagle-thriftmux" % "6.25.0",
+      "com.twitter" %% "finagle-thriftmux" % "6.26.0",
       "com.twitter" %% "scrooge-core" % "3.17.0"
     )
   )

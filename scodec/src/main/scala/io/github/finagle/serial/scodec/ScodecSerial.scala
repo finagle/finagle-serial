@@ -111,4 +111,3 @@ trait ScodecSerial extends Serial {
 }
 
 object ScodecSerial extends ScodecSerial
-

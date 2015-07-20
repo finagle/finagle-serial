@@ -1,4 +1,4 @@
-package i.g.f.s
+package io.github.finagle.serial.benchmark
 
 import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit
@@ -8,7 +8,7 @@ import com.twitter.util.{Closable, Await, Future}
 import org.openjdk.jmh.annotations._
 
 /**
- * run -i 10 -wi 7 -f 2 -t 1 i.g.f.s.RoundTripThriftSmallBenchmark
+ * run -i 10 -wi 7 -f 2 -t 1 io.github.finagle.serial.benchmark.RoundTripThriftSmallBenchmark
  */
 @State(Scope.Thread)
 class RoundTripThriftSmallBenchmark {

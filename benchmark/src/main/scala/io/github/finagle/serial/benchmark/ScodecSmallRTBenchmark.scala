@@ -1,9 +1,9 @@
-package i.g.f.s
+package io.github.finagle.serial.benchmark
 
 import io.github.finagle.serial.scodec.ScodecSerial
 
 /**
- * run -i 10 -wi 7 -f 2 -t 1 i.g.f.s.ScodecSmallRTBenchmark
+ * run -i 10 -wi 7 -f 2 -t 1 io.github.finagle.serial.benchmark.ScodecSmallRTBenchmark
  */
 class ScodecSmallRTBenchmark extends RoundTripBenchmark(Workload.small) {
 

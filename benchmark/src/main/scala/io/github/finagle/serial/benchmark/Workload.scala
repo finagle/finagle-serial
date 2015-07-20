@@ -1,4 +1,4 @@
-package i.g.f.s
+package io.github.finagle.serial.benchmark
 
 import java.util.UUID
 
