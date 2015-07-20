@@ -53,4 +53,3 @@ object ApplicationErrorCodec {
       case e: NoSuchElementException => e.getMessage
     }
 }
-
