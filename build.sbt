@@ -30,6 +30,7 @@ lazy val commonSettings = Seq(
       case _ => Seq.empty
     }
   ),
+  scalacOptions in (Compile, console) := compilerOptions,
   resolvers += "Twitter's Repository" at "https://maven.twttr.com/",
   parallelExecution in Test := false
 )
@@ -48,7 +49,18 @@ lazy val root = project.in(file("."))
     site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "docs"),
     git.remoteRepo := "git@github.com:finagle/finagle-serial.git"
   )
+  .settings(
+    initialCommands in console :=
+      """
+        |import com.twitter.finagle.Service
+        |import com.twitter.util.Future
+        |import io.github.finagle.serial.scodec.ScodecSerial
+        |import scodec.Codec
+        |import scodec.codecs._
+      """.stripMargin
+  )
   .aggregate(core, test, scodec, benchmark)
+  .dependsOn(core, scodec)
 
 lazy val core = project
   .settings(moduleName := "finagle-serial-core")
