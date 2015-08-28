@@ -1,6 +1,7 @@
 # Finagle Serial
 
-[![Build status](https://img.shields.io/travis/finagle/finagle-serial/master.svg)](http://travis-ci.org/finagle/finagle-serial) [![Coverage status](https://img.shields.io/coveralls/finagle/finagle-serial/master.svg)](https://coveralls.io/r/finagle/finagle-serial?branch=master)
+[![Build status](https://img.shields.io/travis/finagle/finagle-serial/master.svg)](http://travis-ci.org/finagle/finagle-serial)
+[![Coverage Status](https://img.shields.io/codecov/c/github/finagle/finagle-serial/master.svg)](https://codecov.io/github/finagle/finagle-serial)
 
 Finagle Serial supports the creation of [Finagle][1] servers and clients that
 use Scala (or Java) libraries for serialization instead of IDL-based systems
