@@ -22,7 +22,7 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.11.7",
   crossScalaVersions := Seq("2.10.5", "2.11.7"),
   libraryDependencies ++= Seq(
-    "com.twitter" %% "finagle-mux" % "6.26.0"
+    "com.twitter" %% "finagle-mux" % "6.28.0"
   ) ++ testDependencies.map(_ % "test"),
   scalacOptions ++= compilerOptions ++ (
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -65,7 +65,6 @@ lazy val root = project.in(file("."))
 lazy val core = project
   .settings(moduleName := "finagle-serial-core")
   .settings(commonSettings ++ publishSettings)
-  .disablePlugins(CoverallsPlugin)
 
 lazy val test = project
   .settings(moduleName := "finagle-serial-test")
@@ -73,7 +72,6 @@ lazy val test = project
   .settings(libraryDependencies ++= testDependencies)
   .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.test\\..*")
   .dependsOn(core)
-  .disablePlugins(CoverallsPlugin)
 
 lazy val scodecSettings = Seq(
   libraryDependencies += "org.scodec" %% "scodec-core" % "1.8.1",
@@ -90,21 +88,18 @@ lazy val scodec = project
   .configs(IntegrationTest)
   .settings(commonSettings ++ publishSettings ++ scodecSettings ++ Defaults.itSettings)
   .dependsOn(core, test % "it")
-  .disablePlugins(CoverallsPlugin)
 
 lazy val benchmark = project
   .settings(moduleName := "finagle-serial-benchmark")
   .settings(commonSettings ++ publishSettings ++ scodecSettings ++ jmhSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.twitter" %% "finagle-thriftmux" % "6.26.0",
-      "com.twitter" %% "scrooge-core" % "3.17.0"
+      "com.twitter" %% "finagle-thriftmux" % "6.28.0",
+      "com.twitter" %% "scrooge-core" % "4.0.0"
     )
   )
-  .settings(com.twitter.scrooge.ScroogeSBT.newSettings: _*)
-  .settings(coverageExcludedPackages := "i\\.g\\.f\\.s\\..*")
+  .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\..*")
   .dependsOn(core, scodec)
-  .disablePlugins(CoverallsPlugin)
 
 lazy val publishSettings = Seq(
   publishMavenStyle := true,
