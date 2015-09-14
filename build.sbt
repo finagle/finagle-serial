@@ -1,5 +1,12 @@
+import ReleaseTransformations._
 import UnidocKeys._
 import scoverage.ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
+
+lazy val buildSettings = Seq(
+  organization := "io.github.finagle",
+  scalaVersion := "2.11.7",
+  crossScalaVersions := Seq("2.10.5", "2.11.7")
+)
 
 lazy val compilerOptions = Seq(
   "-deprecation",
@@ -16,11 +23,7 @@ lazy val compilerOptions = Seq(
   "-Xlint"
 )
 
-lazy val commonSettings = Seq(
-  organization := "io.github.finagle",
-  version := "0.0.1",
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.5", "2.11.7"),
+lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
     "com.twitter" %% "finagle-mux" % "6.28.0"
   ) ++ testDependencies.map(_ % "test"),
@@ -40,9 +43,11 @@ lazy val testDependencies = Seq(
   "org.scalatest" %% "scalatest" % "2.2.5"
 )
 
+lazy val allSettings = buildSettings ++ baseSettings ++ publishSettings
+
 lazy val root = project.in(file("."))
   .settings(moduleName := "finagle-serial")
-  .settings(commonSettings ++ publishSettings)
+  .settings(allSettings)
   .settings(unidocSettings ++ site.settings ++ ghpages.settings)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmark),
@@ -59,26 +64,26 @@ lazy val root = project.in(file("."))
         |import scodec.codecs._
       """.stripMargin
   )
-  .aggregate(core, test, scodec, benchmark)
+  .aggregate(core, tests, scodec, benchmark)
   .dependsOn(core, scodec)
 
 lazy val core = project
   .settings(moduleName := "finagle-serial-core")
-  .settings(commonSettings ++ publishSettings)
+  .settings(allSettings)
 
-lazy val test = project
-  .settings(moduleName := "finagle-serial-test")
-  .settings(commonSettings ++ publishSettings)
+lazy val tests = project
+  .settings(moduleName := "finagle-serial-tests")
+  .settings(allSettings)
   .settings(libraryDependencies ++= testDependencies)
-  .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.test\\..*")
+  .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.tests\\..*")
   .dependsOn(core)
 
 lazy val scodecSettings = Seq(
-  libraryDependencies += "org.scodec" %% "scodec-core" % "1.8.1",
+  libraryDependencies += "org.scodec" %% "scodec-core" % "1.8.2",
   // This is necessary for 2.10 because of Scodec's Shapeless dependency.
   libraryDependencies ++= (
     if (scalaBinaryVersion.value.startsWith("2.10")) Seq(
-      compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
+      compilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
     ) else Nil
   )
 )
@@ -86,25 +91,36 @@ lazy val scodecSettings = Seq(
 lazy val scodec = project
   .settings(moduleName := "finagle-serial-scodec")
   .configs(IntegrationTest)
-  .settings(commonSettings ++ publishSettings ++ scodecSettings ++ Defaults.itSettings)
-  .dependsOn(core, test % "it")
+  .settings(allSettings ++ scodecSettings ++ Defaults.itSettings)
+  .dependsOn(core, tests % "it")
 
 lazy val benchmark = project
   .settings(moduleName := "finagle-serial-benchmark")
-  .settings(commonSettings ++ publishSettings ++ scodecSettings ++ jmhSettings)
+  .settings(allSettings ++ scodecSettings ++ noPublishSettings)
+  .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.benchmark\\..*")
+  .enablePlugins(JmhPlugin)
+  .dependsOn(core, scodec, benchmarkThrift)
+
+lazy val benchmarkThrift = project.in(file("benchmark-thrift"))
+  .settings(moduleName := "finagle-serial-benchmark-thrift")
+  .settings(allSettings ++ scodecSettings ++ noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
       "com.twitter" %% "finagle-thriftmux" % "6.28.0",
       "com.twitter" %% "scrooge-core" % "4.0.0"
     )
   )
-  .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\..*")
+  .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.benchmark\\..*")
   .dependsOn(core, scodec)
 
 lazy val publishSettings = Seq(
+  releaseCrossBuild := true,
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  homepage := Some(url("https://github.com/finagle/finagle-serial")),
+  licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
   publishMavenStyle := true,
-  publishArtifact := true,
-  useGpg := true,
+  publishArtifact in Test := false,
+  pomIncludeRepository := { _ => false },
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
     if (isSnapshot.value)
@@ -112,25 +128,61 @@ lazy val publishSettings = Seq(
     else
       Some("releases"  at nexus + "service/local/staging/deploy/maven2")
   },
-  publishArtifact in Test := false,
-  licenses := Seq("Apache 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
-  homepage := Some(url("https://github.com/finagle/finagle-serial")),
   autoAPIMappings := true,
   apiURL := Some(url("https://finagle.github.io/finagle-serial/docs/")),
+  scmInfo := Some(
+    ScmInfo(
+      url("https://github.com/finagle/finagle-serial"),
+      "scm:git:git@github.com:finagle/finagle-serial.git"
+    )
+  ),
   pomExtra := (
-    <scm>
-      <url>git://github.com/finagle/finagle-serial.git</url>
-      <connection>scm:git://github.com/finagle/finagle-serial.git</connection>
-    </scm>
     <developers>
       <developer>
         <id>travisbrown</id>
         <name>Travis Brown</name>
+        <url>https://twitter.com/travisbrown</url>
       </developer>
       <developer>
         <id>vkostyukov</id>
         <name>Vladimir Kostyukov</name>
+        <url>https://twitter.com/vkostyukov</url>
       </developer>
     </developers>
   )
 )
+
+lazy val noPublishSettings = Seq(
+  publish := (),
+  publishLocal := (),
+  publishArtifact := false
+)
+
+lazy val sharedReleaseProcess = Seq(
+  releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,
+    inquireVersions,
+    runClean,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    publishArtifacts,
+    setNextVersion,
+    commitNextVersion,
+    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+    pushChanges
+  )
+)
+
+credentials ++= (
+  for {
+    username <- Option(System.getenv().get("SONATYPE_USERNAME"))
+    password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
+  } yield Credentials(
+    "Sonatype Nexus Repository Manager",
+    "oss.sonatype.org",
+    username,
+    password
+  )
+).toSeq

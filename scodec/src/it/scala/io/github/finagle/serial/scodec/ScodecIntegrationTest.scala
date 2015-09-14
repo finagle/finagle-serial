@@ -4,7 +4,7 @@ import _root_.scodec._
 import _root_.scodec.codecs._
 import com.twitter.util.Await
 import io.github.finagle.serial.{ApplicationError, CodecError}
-import io.github.finagle.serial.test.SerialIntegrationTest
+import io.github.finagle.serial.tests.SerialIntegrationTest
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.FunSuite
 

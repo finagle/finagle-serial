@@ -1,8 +1,8 @@
-package io.github.finagle.serial.test
+package io.github.finagle.serial.tests
 
 import com.twitter.finagle.{Client, ListeningServer, Server, Service}
 import com.twitter.util.{Await, Future, Try}
-import io.github.finagle.Serial
+import io.github.finagle.serial.Serial
 import java.net.{InetAddress, InetSocketAddress}
 import org.scalatest.Matchers
 import org.scalatest.prop.Checkers
