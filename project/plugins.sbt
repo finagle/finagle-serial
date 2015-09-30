@@ -15,4 +15,4 @@ addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.2.0")
 addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.2.3")
 
 // Used only in the benchmark project
-addSbtPlugin("com.twitter" %% "scrooge-sbt-plugin" % "4.0.0")
+addSbtPlugin("com.twitter" %% "scrooge-sbt-plugin" % "4.1.0")

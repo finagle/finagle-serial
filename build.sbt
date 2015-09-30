@@ -25,7 +25,7 @@ lazy val compilerOptions = Seq(
 
 lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
-    "com.twitter" %% "finagle-mux" % "6.28.0"
+    "com.twitter" %% "finagle-mux" % "6.29.0"
   ) ++ testDependencies.map(_ % "test"),
   scalacOptions ++= compilerOptions ++ (
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -39,7 +39,7 @@ lazy val baseSettings = Seq(
 )
 
 lazy val testDependencies = Seq(
-  "org.scalacheck" %% "scalacheck" % "1.12.4",
+  "org.scalacheck" %% "scalacheck" % "1.12.5",
   "org.scalatest" %% "scalatest" % "2.2.5"
 )
 
@@ -106,8 +106,8 @@ lazy val benchmarkThrift = project.in(file("benchmark-thrift"))
   .settings(allSettings ++ scodecSettings ++ noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.twitter" %% "finagle-thriftmux" % "6.28.0",
-      "com.twitter" %% "scrooge-core" % "4.0.0"
+      "com.twitter" %% "finagle-thriftmux" % "6.29.0",
+      "com.twitter" %% "scrooge-core" % "4.1.0"
     )
   )
   .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.benchmark\\..*")
