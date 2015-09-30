@@ -14,7 +14,8 @@ import org.openjdk.jmh.annotations._
 class RoundTripThriftSmallBenchmark {
   private val smallSize = 20
 
-  val small = thriftscala.Small((for (i <- 1 to smallSize) yield i % 2 == 0).toList, "foo bar baz")
+  val small: thriftscala.Small =
+    thriftscala.Small((for (i <- 1 to smallSize) yield i % 2 == 0).toList, "foo bar baz")
 
   val echo = new thriftscala.EchoService.FutureIface {
     def echo(small: thriftscala.Small) = Future.value(small)
@@ -37,5 +38,5 @@ class RoundTripThriftSmallBenchmark {
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
-  def test = Await.result(c.echo(small))
+  def test: thriftscala.Small = Await.result(c.echo(small))
 }

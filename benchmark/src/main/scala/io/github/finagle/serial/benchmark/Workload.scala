@@ -18,7 +18,7 @@ object Workload {
 
   val medium = Medium(
     (for (i <- 1 to mediumSize) yield i.toString).toList,
-    100l,
+    100L,
     (for (i <- 1 to smallSize) yield Workload.small).toList
   )
 
@@ -29,7 +29,7 @@ object Workload {
 
   object scodec {
     val stringWithLength: Codec[String] = variableSizeBits(uint24, utf8)
-    def listWithLength[A](codec: Codec[A]) = listOfN(uint24, codec)
+    def listWithLength[A](codec: Codec[A]): Codec[List[A]] = listOfN(uint24, codec)
 
     implicit val smallCodec: Codec[Small] = (listWithLength(bool) :: stringWithLength).as[Small]
     implicit val mediumCodec: Codec[Medium] =

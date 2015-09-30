@@ -5,8 +5,7 @@ import _root_.scodec.bits.BitVector
 import _root_.scodec.codecs._
 import com.twitter.io.Buf
 import com.twitter.util.{Return, Throw, Try}
-import io.github.finagle.Serial
-import io.github.finagle.serial.{CodecError, ApplicationError}
+import io.github.finagle.serial.{ApplicationError, CodecError, Serial}
 
 trait ScodecSerial extends Serial {
   type C[A] = Codec[A]

@@ -35,5 +35,5 @@ abstract class RoundTripBenchmark[A](val workload: A) {
   @Benchmark
   @BenchmarkMode(Array(Mode.Throughput))
   @OutputTimeUnit(TimeUnit.SECONDS)
-  def test = Await.result(c(workload))
+  def test: A = Await.result(c(workload))
 }

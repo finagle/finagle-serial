@@ -10,20 +10,20 @@ private[scodec] sealed trait RepMessage[A] {
 }
 
 private[scodec] case class ContentRepMessage[A](a: A) extends RepMessage[A] {
-  def toTry = Return(a)
+  def toTry: Try[A] = Return(a)
 }
 
 private[scodec] case class CodecErrorRepMessage[A](err: CodecError) extends RepMessage[A] {
-  def toTry = Throw(err)
+  def toTry: Try[A] = Throw(err)
 }
 
 private[scodec] case class ApplicationErrorRepMessage[A](err: Throwable) extends RepMessage[A] {
-  def toTry = Throw(err)
+  def toTry: Try[A] = Throw(err)
 }
 
 private[scodec] case class UnhandledApplicationErrorRepMessage[A](err: ApplicationError)
   extends RepMessage[A] {
-    def toTry = Throw(err)
+    def toTry: Try[A] = Throw(err)
   }
 
 private[scodec] object RepMessage {

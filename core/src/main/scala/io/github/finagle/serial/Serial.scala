@@ -1,4 +1,4 @@
-package io.github.finagle
+package io.github.finagle.serial
 
 import com.twitter.finagle
 import com.twitter.finagle._
@@ -28,24 +28,24 @@ trait Serial {
    * Encode a request.
    *
    * A "well-behaved" implementation should only fail with instances of
-   * [[io.github.finagle.serial.CodecError]]; all other errors will result in
-   * an [[com.twitter.finagle.mux.ServerApplicationError]] being returned.
+   * [[CodecError]]; all other errors will result in an
+   * [[com.twitter.finagle.mux.ServerApplicationError]] being returned.
    */
   def encodeReq[A](a: A)(c: C[A]): Try[Bytes]
 
   /**
    * Decode a request.
    *
-   * An implementation should decode [[io.github.finagle.serial.CodecError]] and
-   * return instances as an error.
+   * An implementation should decode [[CodecError]] and return instances as an
+   * error.
    */
   def decodeReq[A](bytes: Bytes)(c: C[A]): Try[A]
 
   /**
    * Encode a result.
    *
-   * An implementation should fail with [[io.github.finagle.serial.CodecError]]
-   * in the event of a encoding error.
+   * An implementation should fail with [[CodecError]] in the event of a
+   * encoding error.
    */
   def encodeRep[A](t: Try[A])(c: C[A]): Try[Bytes]
 
@@ -53,7 +53,7 @@ trait Serial {
    * Decode a result.
    *
    * An implementation should deserialize the errors returned its
-   * [[io.github.finagle.Serial#encodeRep]].
+   * [[Serial#encodeRep]].
    */
   def decodeRep[A](bytes: Bytes)(c: C[A]): Try[A]
 
@@ -150,7 +150,7 @@ trait Serial {
   ) extends finagle.Client[Req, Rep]
     with Stack.Parameterized[Client[Req, Rep]] {
 
-    def params = muxer.params
+    def params: Stack.Params = muxer.params
 
     def withParams(ps: Stack.Params): Client[Req, Rep] = copy(muxer = muxer.withParams(ps))
 
@@ -176,7 +176,7 @@ trait Serial {
   ) extends finagle.Server[Req, Rep]
     with Stack.Parameterized[Server[Req, Rep]] {
 
-    def params = muxer.params
+    def params: Stack.Params = muxer.params
 
     def withParams(ps: Stack.Params): Server[Req, Rep] = copy(muxer = muxer.withParams(ps))
 
@@ -190,7 +190,7 @@ trait Serial {
         } yield mux.Response(toBuf(body))
     }
 
-    def serve(addr: SocketAddress, factory: ServiceFactory[Req, Rep]) =
+    def serve(addr: SocketAddress, factory: ServiceFactory[Req, Rep]): ListeningServer =
       muxer.serve(addr, toMux andThen factory)
   }
 }
