@@ -6,8 +6,8 @@
 Finagle Serial supports the creation of [Finagle][1] servers and clients that
 use Scala (or Java) libraries for serialization instead of IDL-based systems
 like [Apache Thrift][2] or Google's [Protobuf][3]. It's designed to make it easy
-to construct production-ready services that take arbitrary Scala types as inputs
-and outputs, with minimal boilerplate.
+to construct Finagle services that take arbitrary Scala types as inputs and
+outputs, with minimal boilerplate.
 
 Finagle Serial uses [Mux][4] as its session-layer protocol, with object
 serialization (the _presentation layer_, to use the terminology of the
