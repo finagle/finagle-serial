@@ -1,8 +1,8 @@
 language: scala
 
 scala:
-  - 2.10.5
-  - 2.11.7
+  - 2.10.6
+  - 2.11.8
 
 jdk:
   - openjdk7
@@ -10,8 +10,7 @@ jdk:
   - oraclejdk8
 
 script:
-  - travis_retry sbt ++$TRAVIS_SCALA_VERSION coverage test it:test && sbt ++$TRAVIS_SCALA_VERSION coverageAggregate
+  - travis_retry sbt ++$TRAVIS_SCALA_VERSION coverage test it:test scalastyle && sbt ++$TRAVIS_SCALA_VERSION coverageAggregate
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-

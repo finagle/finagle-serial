@@ -4,8 +4,8 @@ import scoverage.ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 
 lazy val buildSettings = Seq(
   organization := "io.github.finagle",
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.5", "2.11.7")
+  scalaVersion := "2.11.8",
+  crossScalaVersions := Seq("2.10.6", "2.11.8")
 )
 
 lazy val compilerOptions = Seq(
@@ -25,7 +25,7 @@ lazy val compilerOptions = Seq(
 
 lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
-    "com.twitter" %% "finagle-mux" % "6.29.0"
+    "com.twitter" %% "finagle-mux" % "6.34.0"
   ) ++ testDependencies.map(_ % "test"),
   scalacOptions ++= compilerOptions ++ (
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -79,11 +79,11 @@ lazy val tests = project
   .dependsOn(core)
 
 lazy val scodecSettings = Seq(
-  libraryDependencies += "org.scodec" %% "scodec-core" % "1.8.2",
+  libraryDependencies += "org.scodec" %% "scodec-core" % "1.9.0",
   // This is necessary for 2.10 because of Scodec's Shapeless dependency.
   libraryDependencies ++= (
     if (scalaBinaryVersion.value.startsWith("2.10")) Seq(
-      compilerPlugin("org.scalamacros" % "paradise" % "2.1.0-M5" cross CrossVersion.full)
+      compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
     ) else Nil
   )
 )
@@ -106,8 +106,8 @@ lazy val benchmarkThrift = project.in(file("benchmark-thrift"))
   .settings(allSettings ++ scodecSettings ++ noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.twitter" %% "finagle-thriftmux" % "6.29.0",
-      "com.twitter" %% "scrooge-core" % "4.1.0"
+      "com.twitter" %% "finagle-thriftmux" % "6.34.0",
+      "com.twitter" %% "scrooge-core" % "4.6.0"
     )
   )
   .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.benchmark\\..*")
