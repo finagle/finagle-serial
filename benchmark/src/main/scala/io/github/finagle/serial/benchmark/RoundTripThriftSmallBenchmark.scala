@@ -3,7 +3,7 @@ package io.github.finagle.serial.benchmark
 import java.net.InetSocketAddress
 import java.util.concurrent.TimeUnit
 
-import com.twitter.finagle.{Client, Server, Service, ThriftMux}
+import com.twitter.finagle.ThriftMux
 import com.twitter.util.{Closable, Await, Future}
 import org.openjdk.jmh.annotations._
 
@@ -26,8 +26,8 @@ class RoundTripThriftSmallBenchmark {
 
   @Setup
   def setUp(): Unit = {
-    s = ThriftMux.serveIface(new InetSocketAddress(8124), echo)
-    c = ThriftMux.newIface[thriftscala.EchoService.FutureIface]("localhost:8124")
+    s = ThriftMux.server.serveIface(new InetSocketAddress(8124), echo)
+    c = ThriftMux.client.newIface[thriftscala.EchoService.FutureIface]("localhost:8124")
   }
 
   @TearDown
