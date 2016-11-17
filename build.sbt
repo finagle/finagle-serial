@@ -1,11 +1,10 @@
 import ReleaseTransformations._
 import UnidocKeys._
-import scoverage.ScoverageSbtPlugin.ScoverageKeys.coverageExcludedPackages
 
 lazy val buildSettings = Seq(
   organization := "io.github.finagle",
   scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.6", "2.11.8")
+  crossScalaVersions := Seq("2.11.8")
 )
 
 lazy val compilerOptions = Seq(
@@ -25,7 +24,7 @@ lazy val compilerOptions = Seq(
 
 lazy val baseSettings = Seq(
   libraryDependencies ++= Seq(
-    "com.twitter" %% "finagle-mux" % "6.34.0"
+    "com.twitter" %% "finagle-mux" % "6.39.0"
   ) ++ testDependencies.map(_ % "test"),
   scalacOptions ++= compilerOptions ++ (
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -39,19 +38,22 @@ lazy val baseSettings = Seq(
 )
 
 lazy val testDependencies = Seq(
-  "org.scalacheck" %% "scalacheck" % "1.12.5",
-  "org.scalatest" %% "scalatest" % "2.2.5"
+  "org.scalacheck" %% "scalacheck" % "1.13.4",
+  "org.scalatest" %% "scalatest" % "3.0.0"
 )
+
+val docMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for API docs")
 
 lazy val allSettings = buildSettings ++ baseSettings ++ publishSettings
 
 lazy val root = project.in(file("."))
   .settings(moduleName := "finagle-serial")
   .settings(allSettings)
-  .settings(unidocSettings ++ site.settings ++ ghpages.settings)
+  .settings(unidocSettings ++ ghpages.settings)
   .settings(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(benchmark),
-    site.addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), "docs"),
+    docMappingsAPIDir := "docs",
+    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docMappingsAPIDir),
     git.remoteRepo := "git@github.com:finagle/finagle-serial.git"
   )
   .settings(
@@ -79,13 +81,7 @@ lazy val tests = project
   .dependsOn(core)
 
 lazy val scodecSettings = Seq(
-  libraryDependencies += "org.scodec" %% "scodec-core" % "1.9.0",
-  // This is necessary for 2.10 because of Scodec's Shapeless dependency.
-  libraryDependencies ++= (
-    if (scalaBinaryVersion.value.startsWith("2.10")) Seq(
-      compilerPlugin("org.scalamacros" % "paradise" % "2.1.0" cross CrossVersion.full)
-    ) else Nil
-  )
+  libraryDependencies += "org.scodec" %% "scodec-core" % "1.10.3"
 )
 
 lazy val scodec = project
@@ -106,8 +102,8 @@ lazy val benchmarkThrift = project.in(file("benchmark-thrift"))
   .settings(allSettings ++ scodecSettings ++ noPublishSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.twitter" %% "finagle-thriftmux" % "6.34.0",
-      "com.twitter" %% "scrooge-core" % "4.6.0"
+      "com.twitter" %% "finagle-thriftmux" % "6.39.0",
+      "com.twitter" %% "scrooge-core" % "4.11.0"
     )
   )
   .settings(coverageExcludedPackages := "io\\.github\\.finagle\\.serial\\.benchmark\\..*")

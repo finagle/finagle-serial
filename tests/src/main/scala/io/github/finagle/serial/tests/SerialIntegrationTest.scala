@@ -1,6 +1,6 @@
 package io.github.finagle.serial.tests
 
-import com.twitter.finagle.{Client, ListeningServer, Server, Service}
+import com.twitter.finagle.{ListeningServer, Service}
 import com.twitter.util.{Await, Future, Try}
 import io.github.finagle.serial.Serial
 import java.net.{InetAddress, InetSocketAddress}
